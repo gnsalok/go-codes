@@ -1,0 +1,4 @@
+POST http://localhost:8080/payload
+Content-Type: application/json
+
+{"name": "Alice", "email": "alice@example.com"}

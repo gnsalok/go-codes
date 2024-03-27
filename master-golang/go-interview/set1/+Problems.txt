@@ -1,0 +1,31 @@
+-- List of Question -- 
+
+(Check JustForFunc for more)
+-- Golang Language specific / feature Inteview Questions --
+[Started with prefix g] 
+
+1. ok, comma idiom in Golang
+2. Implement Set in Go
+3. Slice : CRUD  (How it different from array) 
+4. Files : CRUD
+5. Struct 
+6. Testiing 
+7. Interface
+8. Function VS Method
+9. Write a Calculator Using logical type.
+10. Switch Case in Go
+11. Show Composition using Struct 
+12. (package dir)Write a package in Go. (pkg name "timer") 
+13. String formating in Go
+14. Maps in Go
+<Interface>
+15. Implement reader-writer interface in GO
+16. Implement Error interface 
+
+
+
+
+
+
+
+
