@@ -1,7 +1,6 @@
 package httptest
 
 import (
-	"http"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
