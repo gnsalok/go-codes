@@ -15,7 +15,7 @@ GoMastermind is a collection of various Go language programming exercises and so
 
 ## Features
 
-- Diverse Collection: PS-Go covers a wide range of programming exercises, including algorithms, data structures, and common coding challenges, API, Testing, Benchmarking with extensive notes.
+- Diverse Collection: Go Mastermind covers a wide range of programming exercises, including algorithms, data structures, and common coding challenges, API, Testing, Benchmarking with extensive notes.
 - Clear Problem Statements: Each exercise comes with a well-defined problem statement to guide your implementation.
 - Structured Solutions: Solutions are provided with comments to help you understand the thought process and best practices used.
 - Unit Tests: The repository includes unit tests for each exercise, ensuring code correctness.
@@ -56,5 +56,5 @@ Contributions to **go-mastermind** are encouraged! Whether it's adding new exerc
 
 ---
 
-Explore, learn, and have fun with PS-Go! We hope you find this repository useful on your journey to mastering Go programming. Happy coding! 🚀💻
+Explore, learn, and have fun with Go Matermind! We hope you find this repository useful on your journey to mastering Go programming. Happy coding! 🚀💻
 
