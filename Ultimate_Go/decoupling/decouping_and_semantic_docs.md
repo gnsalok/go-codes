@@ -91,3 +91,6 @@ data.display(d)    // never ever right code like this.
 - They only define a method set of behaviour.
 - Interface value are valueless.
 - When you attach any concrete type it will behave according to the type it passed.
+
+
+- [IMP] Interface Semantic : https://www.ardanlabs.com/blog/2017/07/interface-semantics.html
