@@ -29,6 +29,6 @@ func main() {
 	fmt.Println(u)
 
 	// call the custom method
-	// Type asserstion always happens at Runtime.
+	// Type assestion always happens at Runtime.
 	fmt.Println(&u)
 }

@@ -91,6 +91,10 @@ func main() {
 
 // =============================================================================
 
+// Problem : This program is focuses on, What Cat and Dog are. In Go design, it should focus on what Cat and Dog do (i.e. behaviour). Conventional over Configuration.
+// Choose interface, Interface means Behaviour.
+// See the grouping_fix.go
+
 // NOTES:
 
 // Smells:

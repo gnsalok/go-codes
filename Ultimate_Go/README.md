@@ -15,6 +15,13 @@
 - IMP; Method, Interface and Embedded in Go : https://www.ardanlabs.com/blog/2014/05/methods-interfaces-and-embedded-types.html
 
 
+#### Composition
+- Content : https://github.com/gnsalok/gotraining/tree/master/topics/go/design/composition
+- https://github.com/gnsalok/gotraining/tree/master/topics/go/design/composition
+
+- V.IMP : Type all the examples : https://github.com/gnsalok/gotraining/blob/master/topics/go/design/composition/decoupling/
+- 
+
 
 
 #### Testing 
