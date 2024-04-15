@@ -1,5 +1,6 @@
 
 ### Resources 
+- Design README (All) : https://github.com/gnsalok/gotraining/blob/master/topics/go/README.md
 
 - Ultimate Go Programming, Second Edition -  William Kennedy
   > **NOTE:*** Check out Go materials on [adarlabs](https://www.ardanlabs.com/training/individual-on-demand/ultimate-go-bundle/)
