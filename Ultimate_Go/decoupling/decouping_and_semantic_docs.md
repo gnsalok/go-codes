@@ -27,7 +27,7 @@
 ### There are 3 classes of Types in Golang :
 
 1. Built-in types : Numeric, String, bool
-2. Reference type : Slice, Maps, Channel, Interface value, functions
+2. Reference type : Slice, Maps, Channel, Interface, functions
 3. User defined type : Struct
 
 So,
