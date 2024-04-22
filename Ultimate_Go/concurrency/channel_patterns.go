@@ -56,6 +56,8 @@ func waitForResult() {
 	d := <-ch
 	fmt.Println("parent : recv'd signal :", d)
 
+	// adding comment to test git - need to revert
+
 	time.Sleep(time.Second)
 	fmt.Println("-------------------------------------------------")
 }
