@@ -55,6 +55,7 @@ func waitForResult() {
 
 	d := <-ch
 	fmt.Println("parent : recv'd signal :", d)
+	// adding logs
 
 	time.Sleep(time.Second)
 	fmt.Println("-------------------------------------------------")
