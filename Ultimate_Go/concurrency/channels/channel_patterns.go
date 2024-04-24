@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -27,15 +28,15 @@ func main() {
 	// Advanced patterns
 	// 		fanOutSem()
 	// 		boundedWorkPooling()
-	// 		drop()
+	//drop()
 
 	// Cancellation Pattern
-	// 		cancellation()
+	//cancellation()
 
 	// Retry Pattern
-	// 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	// 		defer cancel()
-	// 		retryTimeout(ctx, time.Second, func(ctx context.Context) error { return errors.New("always fail") })
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	retryTimeout(ctx, time.Second, func(ctx context.Context) error { return errors.New("always fail") })
 
 	// Channel Cancellation
 	// 		stop := make(chan struct{})
@@ -241,7 +242,7 @@ func cancellation() {
 	ch := make(chan string, 1)
 
 	go func() {
-		time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
+		time.Sleep(time.Duration(rand.Intn(300)) * time.Millisecond)
 		ch <- "data"
 	}()
 
