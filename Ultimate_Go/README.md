@@ -37,3 +37,15 @@ https://github.com/gnsalok/gotraining/tree/master/topics/go/design/error_handlin
 
 #### Design Guidelines when you're moving from Concrete to Composition / decoupling 
 https://github.com/gnsalok/gotraining/blob/master/topics/go/design/composition/README.md
+
+#### Concurrency, Goroutines, Channels
+
+Concurrency : https://github.com/gnsalok/gotraining/tree/master/topics/go/concurrency
+Channel (imp) : https://github.com/gnsalok/gotraining/blob/master/topics/go/concurrency/channels/README.md
+Concurrency Patterns : https://github.com/gnsalok/gotraining/tree/master/topics/go/concurrency/patterns
+[Imp] Context : https://github.com/gnsalok/gotraining/tree/master/topics/go/packages/context
+
+### Mutex 
+Mutex README : https://github.com/gnsalok/gotraining/blob/master/topics/go/profiling/mutex/README.md
+Mutex Profile : https://rakyll.org/mutexprofile/
+

@@ -21,7 +21,7 @@ Line 3: Print the Struct Name value.
 */
 
 func main() {
-	s := `[{"firstName":"James","lastName":"Bond","age":32},{"firstName":"Miss","lastName":"Moneypenny","age":27}]`
+	s := `[{"firstName":null,"lastName":"Bond","age":32},{"firstName":"Miss","lastName":"Moneypenny","age":27}]`
 	bs := []byte(s)
 	fmt.Printf("%T\n", s)
 	fmt.Printf("%T\n", bs)
