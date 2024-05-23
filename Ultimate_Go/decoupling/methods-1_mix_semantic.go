@@ -72,7 +72,7 @@ func main() {
 
 	// iterate over the slice of user (copy of users) and changeEmail is ptr usage ptr semantic.
 	// Mixing semantic NOT GOOD!!
-	// Actual email in sliceis not going to change but copy is going to change
+	// Actual email in slice is not going to change but copy is going to change
 	for _, u := range users {
 		u.changeEmail("it@doesntmatter.com")
 	}
