@@ -1,4 +1,4 @@
-# GoMastermind
+# go-codes
 
 ![Go Version](https://img.shields.io/badge/go-v1.20-blue.svg) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/gnsalok/go-mastermind/blob/main/LICENSE)
 
