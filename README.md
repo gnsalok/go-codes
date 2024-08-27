@@ -2,7 +2,7 @@
 
 ![Go Version](https://img.shields.io/badge/go-v1.20-blue.svg) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/gnsalok/go-mastermind/blob/main/LICENSE)
 
-GoMastermind is a collection of various Go language programming exercises and solutions. It serves as a learning resource for Go beginners and a practice ground for experienced developers to hone their Go skills. Each exercise includes a problem statement and a corresponding solution implemented in Go.
+GoCodes is a collection of various Go language programming exercises and solutions. It serves as a learning resource for Go beginners and a practice ground for experienced developers to hone their Go skills. Each exercise includes a problem statement and a corresponding solution implemented in Go.
 
 ## Table of Contents
 
