@@ -89,7 +89,7 @@ data.display(d)    // never ever right code like this.
 - Use?? When the piece of data should give the behavious
 - Interface types are not real. 
 - They only define a method set of behaviour.
-- Interface value are valueless.
+- Interface types are valueless.
 - When you attach any concrete type it will behave according to the type it passed.
 
 
