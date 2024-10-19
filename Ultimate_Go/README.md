@@ -38,6 +38,10 @@ https://github.com/gnsalok/gotraining/tree/master/topics/go/design/error_handlin
 #### Design Guidelines when you're moving from Concrete to Composition / decoupling 
 https://github.com/gnsalok/gotraining/blob/master/topics/go/design/composition/README.md
 
+
+#### Package oriented Design
+https://github.com/gnsalok/gotraining/tree/master/topics/go/design/packaging
+
 #### Concurrency, Goroutines, Channels
 
 Concurrency : https://github.com/gnsalok/gotraining/tree/master/topics/go/concurrency
