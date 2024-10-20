@@ -23,10 +23,10 @@ func unBuffered() {
 
 	go func() {
 		a = "hello, world"
-		<-c
+		<-c // receive
 	}()
 
-	c <- 0
+	c <- 0 // send
 
 	// We are guaranteed to print "hello, world".
 	fmt.Println(a)
