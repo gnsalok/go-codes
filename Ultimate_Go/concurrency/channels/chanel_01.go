@@ -17,6 +17,8 @@ func main() {
 // With unbuffered channels, the receive happens before the corresponding send.
 // The write to a happens before the receive on c, which happens before the
 // corresponding send on c completes, which happens before the print.
+
+// Delivery guarantee - unbuffered channel
 func unBuffered() {
 	c := make(chan int)
 	var a string
@@ -35,6 +37,8 @@ func unBuffered() {
 // With buffered channels, the send happens before the corresponding receive.
 // The write to a happens before the send on c, which happens before the
 // corresponding receive on c completes, which happens before the print.
+
+// No guarantee - Buffered channel
 func buffered() {
 	c := make(chan int, 10)
 	var a string
