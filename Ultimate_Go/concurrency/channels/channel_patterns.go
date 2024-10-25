@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -19,28 +18,49 @@ func init() {
 
 func main() {
 
-	// waitForResult()
-	// fanOut()
-
+	// ------- `waitForTask` pattern can be used for Pooling
 	// waitForTask()
 	// pooling()
 
-	// Advanced patterns
-	// 		fanOutSem()
-	// 		boundedWorkPooling()
-	//drop()
+	// ------- `waitForResult` pattern can be used for "Drop" and "Fan-out" pattern. ****
+	// waitForResult()
+	// fanOut()
+	drop()
 
+	// More advanced patterns
+	// fanOutSem()
+	// boundedWorkPooling()
+
+	// waitForFinished()
 	// Cancellation Pattern
 	//cancellation()
 
-	// Retry Pattern
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	retryTimeout(ctx, time.Second, func(ctx context.Context) error { return errors.New("always fail") })
+	// ------- Retry Pattern
+	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// defer cancel()
+	// retryTimeout(ctx, time.Second, func(ctx context.Context) error { return errors.New("always fail") })
 
-	// Channel Cancellation
-	// 		stop := make(chan struct{})
-	// 		channelCancellation(stop)
+	// ------- Channel Cancellation
+	//	stop := make(chan struct{})
+	// channelCancellation(stop)
+}
+
+// waitForTask: In this pattern, the parent goroutine sends a signal to a
+// child goroutine for waiting to be told what to do.
+func waitForTask() {
+	ch := make(chan string)
+
+	go func() {
+		data := <-ch // RECEIVE :: this is wait for task ; add unknown latency. Guarantees.
+		fmt.Println("child : recv'd signal :", data)
+	}()
+
+	time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
+	ch <- "data" // SEND
+	fmt.Println("parent : sent signal")
+
+	time.Sleep(time.Second)
+	fmt.Println("-------------------------------------------------")
 }
 
 // waitForResult: In this pattern, the parent goroutine waits for the child
@@ -61,66 +81,43 @@ func waitForResult() {
 	fmt.Println("-------------------------------------------------")
 }
 
-// fanOut: In this pattern, the parent goroutine creates 2000 child goroutines
-// and waits for them to signal their results.
-func fanOut() {
-	children := 2000
-	ch := make(chan string, children)
-
-	for c := 0; c < children; c++ {
-		go func(child int) {
-			time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
-			ch <- "data"
-			fmt.Println("child : sent signal :", child)
-		}(c)
-	}
-
-	for children > 0 {
-		d := <-ch
-		children--
-		fmt.Println(d)
-		fmt.Println("parent : recv'd signal :", children)
-	}
-
-	time.Sleep(time.Second)
-	fmt.Println("-------------------------------------------------")
-}
-
-// waitForTask: In this pattern, the parent goroutine sends a signal to a
-// child goroutine waiting to be told what to do.
-func waitForTask() {
-	ch := make(chan string)
+// Note : you can better achieve this with waitGroup
+func waitForFinished() {
+	ch := make(chan struct{})
 
 	go func() {
-		d := <-ch
-		fmt.Println("child : recv'd signal :", d)
+		time.Sleep(time.Duration(rand.Intn(500)) * time.Microsecond)
+		close(ch)
+		fmt.Println("employee : sent signal")
 	}()
 
-	time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
-	ch <- "data"
-	fmt.Println("parent : sent signal")
+	_, wd := <-ch // if signal with data then wd will be true; this is boolean flag, no data to receive.
+	fmt.Println("manager : received signal : ", wd)
 
-	time.Sleep(time.Second)
-	fmt.Println("-------------------------------------------------")
+	time.Sleep(1 * time.Second)
 }
 
 // pooling: In this pattern, the parent goroutine signals 100 pieces of work
 // to a pool of child goroutines waiting for work to perform.
+// This is kind of WaitForTask Patterns
 func pooling() {
 	ch := make(chan string)
 
-	g := runtime.GOMAXPROCS(0)
+	const emps = 2
 
-	for c := 0; c < g; c++ {
-		go func(child int) {
-			for d := range ch {
-				fmt.Printf("child %d : recv'd signal : %s\n", child, d)
+	for e := 0; e < emps; e++ {
+		// launches 2 goroutine
+		go func(emp int) {
+			// This will keep polling to get task ; and get closed when channel is closed.
+			// getting data from channel :: putting channel in wait state to get Task
+			for p := range ch {
+				fmt.Printf("child %d : recv'd signal : %s\n", emp, p)
 			}
-			fmt.Printf("child %d : recv'd shutdown signal\n", child)
-		}(c)
+			fmt.Printf("child %d : recv'd shutdown signal\n", emp)
+		}(e)
 	}
 
-	const work = 100
+	const work = 10
 	for w := 0; w < work; w++ {
 		ch <- "data"
 		fmt.Println("parent : sent signal :", w)
@@ -128,6 +125,32 @@ func pooling() {
 
 	close(ch)
 	fmt.Println("parent : sent shutdown signal")
+
+	time.Sleep(time.Second)
+	fmt.Println("-------------------------------------------------")
+}
+
+// fanOut: In this pattern, the parent goroutine creates 2000 child goroutines
+// and waits for them to signal their results.
+// This is kind of WaitForResult Patterns
+func fanOut() {
+	emps := 20
+	ch := make(chan string, emps)
+
+	for c := 0; c < emps; c++ {
+		go func(emp int) {
+			time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
+			ch <- "data"
+			fmt.Println("child : sent signal :", emp)
+		}(c)
+	}
+
+	for emps > 0 {
+		d := <-ch // receive
+		emps--
+		fmt.Println(d)
+		fmt.Println("parent : recv'd signal :", emps)
+	}
 
 	time.Sleep(time.Second)
 	fmt.Println("-------------------------------------------------")
@@ -203,8 +226,10 @@ func boundedWorkPooling() {
 // drop: In this pattern, the parent goroutine signals 2000 pieces of work to
 // a single child goroutine that can't handle all the work. If the parent
 // performs a send and the child is not ready, that work is discarded and dropped.
+
+// Rate limit you can assume here
 func drop() {
-	const cap = 100
+	const cap = 5
 	ch := make(chan string, cap)
 
 	go func() {
@@ -213,12 +238,14 @@ func drop() {
 		}
 	}()
 
-	const work = 2000
+	const work = 300
+
+	// for select allow to do multiple channel operation
 	for w := 0; w < work; w++ {
 		select {
 		case ch <- "data":
 			fmt.Println("parent : sent signal :", w)
-		default:
+		default: // default case will execute when we are unable to send data into buffered channel and drop the request
 			fmt.Println("parent : dropped data :", w)
 		}
 	}
