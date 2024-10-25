@@ -15,7 +15,8 @@ GoCodes is a collection of various Go language programming exercises and solutio
 
 ## Features
 
-- Diverse Collection: Go Mastermind covers a wide range of programming exercises, including algorithms, data structures, and common coding challenges, API, Testing, Benchmarking with extensive notes.
+- Diverse Collection: **go-codes** covers a wide range of programming exercises, including algorithms, data structures, and common coding challenges, API, Testing, Benchmarking with extensive notes.
+- Detailed Concurrency and Channel patterns are documented under `Ultimate_Go/concurrency/channels/*` directory.
 - Clear Problem Statements: Each exercise comes with a well-defined problem statement to guide your implementation.
 - Structured Solutions: Solutions are provided with comments to help you understand the thought process and best practices used.
 - Unit Tests: The repository includes unit tests for each exercise, ensuring code correctness.
@@ -32,7 +33,7 @@ To run the exercises and solutions in this repository, you need to have the foll
 To use this repository, simply clone it to your local machine:
 
 ```bash
-git clone https://github.com/gnsalok/go-mastermind.git
+git clone https://github.com/gnsalok/go-codes.git
 ```
 
 ## Usage
@@ -49,12 +50,12 @@ Feel free to experiment with the code, modify the solutions, and create new exer
 
 ## Contributing
 
-Contributions to **go-mastermind** are encouraged! Whether it's adding new exercises, improving existing solutions, or enhancing the documentation, every contribution is valuable. Please read our [Contribution Guidelines](CONTRIBUTING.md) for more details on how to get involved.
+Contributions to **go-codes** are encouraged! Whether it's adding new exercises, improving existing solutions, or enhancing the documentation, every contribution is valuable. Please read our [Contribution Guidelines](CONTRIBUTING.md) for more details on how to get involved.
 
-## Maintainer
+## Lead Maintainer
 **Alok Tripathi** - *Github* - [Alok Tripathi](https://github.com/gnsalok)
 
 ---
 
-Explore, learn, and have fun with Go Matermind! We hope you find this repository useful on your journey to mastering Go programming. Happy coding! 🚀💻
+Explore, learn, and have fun with **go-codes**! We hope you find this repository useful on your journey to mastering Go programming. Happy coding! 🚀💻
 
