@@ -24,7 +24,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(req.Context(), 50*time.Millisecond)
 	defer cancel()
 
-	// Bind the new context into the request.
+	// Bind the new context into the request. ; Reason is because, Context is having value semantic.
 	req = req.WithContext(ctx)
 
 	// Make the web call and return any error. Do will handle the
