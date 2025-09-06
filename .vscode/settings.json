@@ -4,6 +4,8 @@
         "plaintext": false,
         "markdown": true,
         "scminput": false,
-        "python": true
+        "python": true,
+        "go": true,
+        "http": true
     }
 }
