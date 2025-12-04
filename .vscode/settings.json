@@ -5,7 +5,7 @@
         "markdown": true,
         "scminput": false,
         "python": true,
-        "go": true,
+        "go": false,
         "http": true
     }
 }
