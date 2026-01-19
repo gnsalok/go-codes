@@ -59,3 +59,5 @@ Mutex Profile : https://rakyll.org/mutexprofile/
 **Bill Kennedy's GopherCon Talks**
 * [Understanding Escape Analysis in Go](https://www.youtube.com/watch?v=FUm0pfgWehI&list=PL2ntRZ1ySWBeBA1lEnmD3vUedkRDvgnmw&index=5&t=155s)
 * [Go's Trace Tooling and Concurrency Patterns](https://www.youtube.com/watch?v=Gqo0oCfZSjg&list=PL2ntRZ1ySWBeBA1lEnmD3vUedkRDvgnmw&index=12)
+
+* [Go Garbage Collection with Green Tea](https://www.youtube.com/watch?v=gPJkM95KpKo&list=PL2ntRZ1ySWBeBA1lEnmD3vUedkRDvgnmw&index=22)
