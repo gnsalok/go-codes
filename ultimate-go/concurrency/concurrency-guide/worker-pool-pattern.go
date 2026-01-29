@@ -7,15 +7,13 @@ import (
 )
 
 // worker function
-func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
-	defer wg.Done()
+func worker(id int, jobs <-chan int, results chan<- int) {
 
 	for j := range jobs {
-		fmt.Println("worker %d started job %d\n", j)
+		fmt.Printf("worker: %d started job %d\n", id, j)
 		time.Sleep(500 * time.Microsecond) // simulate work
 		results <- j * 2                   // send result
 	}
-
 }
 
 func main() {
@@ -32,10 +30,13 @@ func main() {
 	var wg sync.WaitGroup
 
 	// 3. Spawn Workers
-	// We start 3 goroutines that all listen to the SAME jobs channel
+	// We start numWorkers goroutines that all listen to the SAME jobs channel.
+	// Use wg.Add/Done and capture loop variable to avoid closure capture issues.
 	for w := 1; w <= numWorkers; w++ {
-		wg.Add(1)
-		go worker(w, jobs, results, &wg)
+		w := w
+		wg.Go(func() {
+			worker(w, jobs, results)
+		})
 	}
 
 	// 4. Send jobs
