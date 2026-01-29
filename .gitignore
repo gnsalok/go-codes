@@ -4,3 +4,8 @@
 .xml
 .DS_Store
 .idea/
+.vscode/
+*.log
+*.out
+*.exe
+*.exe~

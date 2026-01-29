@@ -9,6 +9,7 @@ import (
 /*
 UNICODE & RUNE in GO :	https://golangbyexample.com/understanding-rune-in-golang/
 When to use :
+- rune is an alias for int32, and it represents a Unicode code point.
 - You should use a rune when you intend to save Unicode Code Point in the rune value.
 - A rune array should be used when all values in the array are meant to be a Unicode Code Point.
 - Rune is also used to represent a character.
