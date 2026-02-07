@@ -1,6 +1,0 @@
-
--- Problem Solving Using Go  -----
-p1. Define array, initialize, use and print.
-p2. WAF to return sum of float arr value.
-p3. WAF which return factorial of given number.
-p4. Take input from user and print table for that in runtime.

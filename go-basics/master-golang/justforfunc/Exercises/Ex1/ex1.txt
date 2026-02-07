@@ -1,8 +1,0 @@
-Using GoRoutine concurrency to add two 2D matrix where each goroutine will add one row, so for matrix of size m(rows) x n(columns) 
-it will use m goroutines in parallel to add them produce the output. You can assume m and n values to be 20 and 50 in your first version 
-of this program. 
-
-Also two input matrix should be read from two files 
-(e.g. File1 = 1st matrix, File 2 = 2nd matrix) and result matrix should be written 
-
-to 3rd file).Improve the above program to allow any dynamic size 2D a matrix Hint: Use slices
