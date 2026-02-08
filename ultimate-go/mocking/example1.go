@@ -5,7 +5,7 @@
 // you need to for your own packages or tests.
 package main
 
-import "github.com/gnsalok/go-codes/ultimate-go/mocking/pubsub"
+import "github.com/gnsalok/go-mastermind/Ultimate_Go/mocking/pubsub"
 
 // publisher is an interface to allow this package to mock the pubsub
 // package support.

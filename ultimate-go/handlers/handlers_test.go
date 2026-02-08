@@ -3,12 +3,10 @@ package handlers_test
 
 import (
 	"encoding/json"
-
+	"github.com/gnsalok/go-mastermind/Ultimate_Go/handlers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gnsalok/go-codes/ultimate-go/handlers"
 )
 
 const succeed = "\u2713"
