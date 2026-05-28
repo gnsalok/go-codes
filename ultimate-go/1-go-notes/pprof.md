@@ -62,6 +62,15 @@ func main() {
 
 `pprof` provides a "living" look into the heap. In your scenario, here is how you would have used it:
 
+
+First run the application `go run main.go` and generate some traffic by hitting `http://localhost:8080/process` multiple times. You would see memory usage climbing in your system monitor.
+
+Generating traffic can be done with a simple loop in another terminal:
+
+```bash
+for i in {1..20000}; do curl -s http://localhost:8080/process >/dev/null; done
+```
+
 ### Step A: Capturing the Heap
 
 While the service is running and memory is climbing, you would run the following command to grab a snapshot:
