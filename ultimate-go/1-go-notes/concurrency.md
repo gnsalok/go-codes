@@ -518,13 +518,3 @@ Scarcity refers to limited CPU, Memory, and Network I/O. If you launch 1 million
 | **Correctness** | `sync.Mutex`, `atomic`, `-race` flag | Prevents race conditions and ensures memory visibility. |
 | **Coordination** | `chan`, `sync.WaitGroup`, `context` | Synchronizes execution flow and handles graceful shutdowns. |
 | **Scarcity** | Worker Pools, Buffered Channels, `sync.Pool` | Prevents system exhaustion (OOM, Too many open files). |
-
----
-
-### The "Senior" Interview Answer
-
-If a Veeam interviewer asks how you balance these, you should say:
-
-> "I prioritize **Coordination** via `context` and `channels` to keep the design clean. I ensure **Correctness** by defining strict 'ownership' of data (only one goroutine owns a piece of data at a time). Finally, I respect **Scarcity** by using worker pools and rate limiters so the system remains resilient under heavy load."
-
-**Would you like to see a code example of a "Semaphore" using buffered channels to handle a scarce resource like a Database connection?**
