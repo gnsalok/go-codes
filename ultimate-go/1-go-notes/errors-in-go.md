@@ -218,14 +218,91 @@ func main() {
 
 ---
 
-## Summary Best Practices
+## error.is vs error.as
 
-| What to do | How to do it |
-| --- | --- |
-| **Simple text error** | Use `errors.New("message")` |
-| **Dynamic text error** | Use `fmt.Errorf("failed: %s", detail)` |
-| **Add context to an existing error** | Use `fmt.Errorf("context: %w", err)` |
-| **Check if an error matches a sentinel** | Use `errors.Is(err, target)` |
-| **Extract a custom error type** | Use `errors.As(err, &customErrTarget)` |
+Think of it this way:
 
-Which specific part of error handling—like writing clean code to avoid "if err != nil" boilerplate, or custom error architectures—would you like to dive into next?
+* Use **`errors.Is`** when you are looking for a **specific instance** of an error (like a specific variable).
+* Use **`errors.As`** when you are looking for a **specific type** of error (so you can cast it and read its unique fields).
+
+---
+
+## 1. Simple `errors.Is` Example (Checking for a specific error)
+
+Imagine you have a predefined global error (often called a sentinel error) for when an item is out of stock. You wrap it with extra context, but you still need to check if the root cause was that "out of stock" error.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+// 1. Define a specific, reusable error variable
+var ErrOutOfStock = errors.New("item is out of stock")
+
+func buyItem() error {
+	// 2. We wrap our specific error with more context using %w
+	return fmt.Errorf("checkout failed: %w", ErrOutOfStock)
+}
+
+func main() {
+	err := buyItem()
+
+	// 3. Use errors.Is to see if ErrOutOfStock is anywhere inside that error chain
+	if errors.Is(err, ErrOutOfStock) {
+		fmt.Println("Show user: 'Sorry, this item sold out!'")
+	} else {
+		fmt.Println("Show user: 'Something went wrong with your payment.'")
+	}
+}
+
+```
+
+---
+
+## 2. Simple `errors.As` Example (Extracting a custom error type)
+
+Imagine you created a custom error struct because you need to pass an HTTP status code along with the error. You want to extract that status code later.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+// 1. Define a custom error type with a specific field (Code)
+type HttpError struct {
+	Code    int
+	Message string
+}
+
+func (e *HttpError) Error() string {
+	return fmt.Sprintf("HTTP %d: %s", e.Code, e.Message)
+}
+
+func fetchPage() error {
+	// 2. Return the custom error, wrapped in extra context
+	myErr := &HttpError{Code: 404, Message: "Page Not Found"}
+	return fmt.Errorf("crashing during fetch: %w", myErr)
+}
+
+func main() {
+	err := fetchPage()
+
+	// 3. Create an empty pointer of your custom error type
+	var targetErr *HttpError
+
+	// 4. errors.As checks if the error matches the type, and if so,
+	//    it automatically extracts it into 'targetErr'
+	if errors.As(err, &targetErr) {
+		fmt.Printf("Extracted successfully! HTTP Status Code was: %d\n", targetErr.Code)
+	} else {
+		fmt.Println("It was a completely different kind of error.")
+	}
+}
+
+```
