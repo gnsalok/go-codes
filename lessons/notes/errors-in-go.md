@@ -98,16 +98,88 @@ func main() {
 
 ---
 
-## 4. Modern Error Handling: Wrapping and Unwrapping (Go 1.13+)
+## 4. Modern Error Handling: Wrapping, Unwrapping, `errors.Is`, and `errors.As` (Go 1.13+)
 
 When an error passes up through multiple layers of your application, you often want to add context to it without losing the original error. Go allows you to **wrap** errors using `%w` in `fmt.Errorf`.
 
-### Wrapping Errors
+### Wrapping Errors with `fmt.Errorf` and `%w`
+
+Wrapping means: add extra context to an error, but keep the original error available for later checks.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func readConfig() error {
+	return errors.New("file does not exist")
+}
+
+func startApp() error {
+	err := readConfig()
+	if err != nil {
+		// %w wraps the original error.
+		return fmt.Errorf("could not start app: %w", err)
+	}
+	return nil
+}
+
+func main() {
+	err := startApp()
+	fmt.Println(err)
+	// Output: could not start app: file does not exist
+}
+
+```
+
+Short form:
 
 ```go
 originalErr := errors.New("permission denied")
+
 // Wrapping the original error with more context
 wrappedErr := fmt.Errorf("failed to delete file: %w", originalErr)
+
+```
+
+Use `%w` only when you want the caller to be able to inspect the original error with `errors.Is`, `errors.As`, or `errors.Unwrap`. If you only want text formatting and do not want wrapping, use `%v`.
+
+### Unwrapping Errors with `errors.Unwrap`
+
+`errors.Unwrap` returns the next error inside a wrapped error chain.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func main() {
+	rootErr := errors.New("connection refused")
+	wrappedErr := fmt.Errorf("database failed: %w", rootErr)
+
+	unwrappedErr := errors.Unwrap(wrappedErr)
+
+	fmt.Println(wrappedErr)
+	fmt.Println(unwrappedErr)
+
+	// Output:
+	// database failed: connection refused
+	// connection refused
+}
+
+```
+
+If the error does not wrap another error, `errors.Unwrap` returns `nil`.
+
+```go
+err := errors.New("plain error")
+fmt.Println(errors.Unwrap(err)) // Output: <nil>
 
 ```
 
@@ -218,16 +290,18 @@ func main() {
 
 ---
 
-## error.is vs error.as
+## `errors.Is` vs `errors.As`
 
 Think of it this way:
 
 * Use **`errors.Is`** when you are looking for a **specific instance** of an error (like a specific variable).
 * Use **`errors.As`** when you are looking for a **specific type** of error (so you can cast it and read its unique fields).
+* Use **`fmt.Errorf` with `%w`** when you want to **wrap** an error with extra context.
+* Use **`errors.Unwrap`** when you want to manually get the **next error** inside a wrapped error.
 
 ---
 
-## 1. Simple `errors.Is` Example (Checking for a specific error)
+## Simple `errors.Is` Example (Checking for a specific error)
 
 Imagine you have a predefined global error (often called a sentinel error) for when an item is out of stock. You wrap it with extra context, but you still need to check if the root cause was that "out of stock" error.
 
@@ -262,7 +336,7 @@ func main() {
 
 ---
 
-## 2. Simple `errors.As` Example (Extracting a custom error type)
+## Simple `errors.As` Example (Extracting a custom error type)
 
 Imagine you created a custom error struct because you need to pass an HTTP status code along with the error. You want to extract that status code later.
 
@@ -303,6 +377,129 @@ func main() {
 	} else {
 		fmt.Println("It was a completely different kind of error.")
 	}
+}
+
+```
+
+---
+
+## Simple Wrap Example
+
+Use `%w` inside `fmt.Errorf` to wrap an error.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func openFile() error {
+	return errors.New("permission denied")
+}
+
+func loadUserProfile() error {
+	err := openFile()
+	if err != nil {
+		return fmt.Errorf("load user profile failed: %w", err)
+	}
+	return nil
+}
+
+func main() {
+	err := loadUserProfile()
+	fmt.Println(err)
+	// Output: load user profile failed: permission denied
+}
+
+```
+
+---
+
+## Simple `errors.Unwrap` Example
+
+Use `errors.Unwrap` when you want to manually pull out the directly wrapped error.
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func main() {
+	originalErr := errors.New("disk full")
+	wrappedErr := fmt.Errorf("save report failed: %w", originalErr)
+
+	fmt.Println("wrapped:", wrappedErr)
+	fmt.Println("unwrapped:", errors.Unwrap(wrappedErr))
+
+	// Output:
+	// wrapped: save report failed: disk full
+	// unwrapped: disk full
+}
+
+```
+
+---
+
+## All Together: `Is`, `As`, Wrap, and Unwrap
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrUnauthorized = errors.New("unauthorized")
+
+type RequestError struct {
+	StatusCode int
+	Err        error
+}
+
+func (e *RequestError) Error() string {
+	return fmt.Sprintf("request failed with status %d: %v", e.StatusCode, e.Err)
+}
+
+func (e *RequestError) Unwrap() error {
+	return e.Err
+}
+
+func callAPI() error {
+	requestErr := &RequestError{
+		StatusCode: 401,
+		Err:        ErrUnauthorized,
+	}
+
+	// Wrap the custom error with more context.
+	return fmt.Errorf("call API: %w", requestErr)
+}
+
+func main() {
+	err := callAPI()
+
+	// 1. Wrap: callAPI returned an error wrapped with fmt.Errorf and %w.
+	fmt.Println(err)
+
+	// 2. Is: check whether ErrUnauthorized exists anywhere in the chain.
+	if errors.Is(err, ErrUnauthorized) {
+		fmt.Println("errors.Is: user must log in again")
+	}
+
+	// 3. As: extract a specific error type from anywhere in the chain.
+	var requestErr *RequestError
+	if errors.As(err, &requestErr) {
+		fmt.Println("errors.As: status code is", requestErr.StatusCode)
+	}
+
+	// 4. Unwrap: get the next directly wrapped error.
+	nextErr := errors.Unwrap(err)
+	fmt.Println("errors.Unwrap:", nextErr)
 }
 
 ```
