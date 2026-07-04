@@ -1,19 +1,19 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func worker1(id int, results chan string, done chan bool) {
+func worker1(id int, results chan<- string, done chan<- struct{}) {
+	// results is buffered to numWorkers in main. That guarantees each worker can
+	// publish its single result before sending the done signal.
 	results <- fmt.Sprintf("Worker %d finished", id)
-	done <- true // Signal completion
+	done <- struct{}{}
 }
 
 func main() {
-	results := make(chan string) // Unbuffered channel
-	done := make(chan bool)      // Channel to signal completion
-
 	numWorkers := 5
+
+	results := make(chan string, numWorkers)
+	done := make(chan struct{})
 
 	for i := 1; i <= numWorkers; i++ {
 		go worker1(i, results, done)
@@ -21,9 +21,9 @@ func main() {
 
 	go func() {
 		for i := 0; i < numWorkers; i++ {
-			<-done // Wait for each worker to signal completion
+			<-done
 		}
-		close(results) // Close results channel after all workers are done
+		close(results)
 	}()
 
 	for result := range results {

@@ -518,3 +518,33 @@ Scarcity refers to limited CPU, Memory, and Network I/O. If you launch 1 million
 | **Correctness** | `sync.Mutex`, `atomic`, `-race` flag | Prevents race conditions and ensures memory visibility. |
 | **Coordination** | `chan`, `sync.WaitGroup`, `context` | Synchronizes execution flow and handles graceful shutdowns. |
 | **Scarcity** | Worker Pools, Buffered Channels, `sync.Pool` | Prevents system exhaustion (OOM, Too many open files). |
+
+---
+
+## Four questions before adding a goroutine
+
+1. **Who owns this goroutine?** The owner is responsible for waiting, cancelling, or intentionally letting it run for the process lifetime.
+2. **How does it stop?** Common stop paths are closed input channels, `context.Context`, finite loops, or process shutdown.
+3. **How do errors get reported?** A goroutine cannot return to its caller directly, so use a result channel, `errgroup`, callback, log, or aggregated error.
+4. **What shared state does it access?** If multiple goroutines touch the same memory, use ownership transfer, `sync.Mutex`, or `sync/atomic`.
+
+| Need | Tool |
+| --- | --- |
+| Wait for goroutines to finish | `sync.WaitGroup` |
+| Return first error and cancel siblings | `errgroup.WithContext` |
+| Pass data or stream results | Channel |
+| Protect shared mutable state | `sync.Mutex` |
+| Count simple numeric events | `sync/atomic` |
+| Stop request-scoped work | `context.Context` |
+| Limit concurrency | Worker pool or buffered-channel semaphore |
+
+`sync.WaitGroup` only waits for completion. It does **not** propagate errors, cancel work, protect memory, or collect results. If you need those behaviors, combine it with channels, context, mutexes, or use `errgroup.WithContext`.
+
+## Orchestration, synchronization, communication, and cancellation
+
+- **Orchestration** decides when work starts, finishes, and shuts down. Tools: `WaitGroup`, channel close, `errgroup`.
+- **Synchronization** protects shared memory from races. Tools: `sync.Mutex`, `sync.RWMutex`, `sync/atomic`.
+- **Communication** moves data or ownership between goroutines. Tool: channels.
+- **Cancellation** tells work to stop early. Tool: `context.Context` for request-scoped and API-boundary work.
+
+Production code usually needs more than one of these. For example, a worker pool often uses a context for cancellation, a jobs channel for communication, a results channel for output, and a WaitGroup or errgroup for orchestration.
