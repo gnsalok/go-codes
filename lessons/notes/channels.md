@@ -176,3 +176,100 @@ func fetchAll(urls []string) []string {
 }
 
 ```
+---
+
+## Production channel rules
+
+1. **The sender owns closing the channel.** Close means “no more values will be sent.”
+2. **Receivers should not close a channel they did not create for sending.** A receiver cannot know whether another sender is still active.
+3. **Closing is a broadcast to receivers, not a safe way to stop senders.** Use `context.Context` or a separate stop signal when senders need to exit.
+4. **A send on a closed channel panics.** This is why close ownership must be explicit.
+5. **A receive from a closed channel returns immediately.** Use the two-value receive when zero values are meaningful: `v, ok := <-ch`.
+6. **Use `for v := range ch` only when someone definitely closes the channel.** Otherwise the receiver can block forever.
+7. **Do not use buffered channels to hide deadlocks.** Buffers change timing; they do not fix broken ownership.
+8. **Pick buffer sizes from real constraints.** Good reasons include worker count, expected burst size, bounded queue size, memory budget, and external service limits.
+9. **Use `context.Context` for cancellation across API boundaries.** It composes better than custom done channels.
+10. **Use `select` with `ctx.Done()` around blocking sends or receives that may outlive the caller.**
+
+Example: cancellable result send.
+
+```go
+func publish(ctx context.Context, results chan<- Result, r Result) error {
+    select {
+    case results <- r:
+        return nil
+    case <-ctx.Done():
+        return ctx.Err()
+    }
+}
+```
+
+## Common production failures
+
+| Failure | Symptom | Fix |
+| --- | --- | --- |
+| Goroutine leak | A goroutine waits forever on send, receive, timer, or I/O | Make the goroutine observe context cancellation |
+| Deadlock | Program stops with all goroutines blocked | Check which goroutine sends, receives, and closes each channel |
+| Send on closed channel | Panic | Make one sending owner responsible for close |
+| Unbounded fan-out | Memory, CPU, or connection spikes | Use a worker pool or semaphore |
+| Data race | Inconsistent shared state | Transfer ownership through channels, or use mutex/atomic |
+| Swallowed goroutine error | Caller thinks work succeeded | Return errors through a result channel or use `errgroup` |
+
+## Production template: bounded concurrent work
+
+```go
+type Job struct{ ID int }
+type Result struct {
+    JobID int
+    Err   error
+}
+
+func run(ctx context.Context, input []Job, workers int) <-chan Result {
+    jobs := make(chan Job)
+    results := make(chan Result)
+    var wg sync.WaitGroup
+
+    for i := 0; i < workers; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for {
+                select {
+                case <-ctx.Done():
+                    return
+                case job, ok := <-jobs:
+                    if !ok {
+                        return
+                    }
+                    result := Result{JobID: job.ID}
+                    select {
+                    case results <- result:
+                    case <-ctx.Done():
+                        return
+                    }
+                }
+            }
+        }()
+    }
+
+    go func() {
+        defer close(jobs)
+        for _, job := range input {
+            select {
+            case jobs <- job:
+            case <-ctx.Done():
+                return
+            }
+        }
+    }()
+
+    go func() {
+        wg.Wait()
+        close(results)
+    }()
+
+    return results
+}
+```
+
+Ownership in this template is deliberate: the producer closes `jobs`, workers only receive from `jobs`, and a coordinator closes `results` only after all workers stop sending.

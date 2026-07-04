@@ -43,14 +43,16 @@ func main() {
 }
 
 func startComponent(ctx context.Context, name string) error {
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
 	for {
 		select {
-		case <-ctx.Done(): // 4. This is the 'Listen' part of orchestration
+		case <-ctx.Done(): // 4. This is the 'Listen' part of orchestration.
 			fmt.Printf("Shutting down %s cleanly...\n", name)
 			return ctx.Err()
-		default:
+		case <-ticker.C:
 			fmt.Printf("%s is running...\n", name)
-			time.Sleep(1 * time.Second)
 		}
 	}
 }

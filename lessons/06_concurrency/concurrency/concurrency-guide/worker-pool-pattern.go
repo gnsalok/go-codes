@@ -31,19 +31,25 @@ func main() {
 
 	// 3. Spawn Workers
 	// We start numWorkers goroutines that all listen to the SAME jobs channel.
-	// Use wg.Add/Done and capture loop variable to avoid closure capture issues.
+	// Add must happen before the goroutine starts, and each goroutine calls
+	// Done when it returns. This explicit form is the most common production
+	// pattern and works across Go versions.
 	for w := 1; w <= numWorkers; w++ {
-		w := w
-		wg.Go(func() {
+		w := w // capture loop variable
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			worker(w, jobs, results)
-		})
+		}()
 	}
 
 	// 4. Send jobs
+	// The producer owns closing jobs. Workers only receive from jobs, so they
+	// should never close it.
 	for j := 1; j <= numJobs; j++ {
 		jobs <- j
 	}
-	close(jobs) // Signal to workers that no more jobs are coming
+	close(jobs) // Signal to workers that no more jobs are coming.
 
 	// 5. Wait for completion in a separate goroutine
 	// Why separate? Because we need to close 'results' channel. If you will not close the results channel:

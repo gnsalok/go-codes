@@ -12,6 +12,7 @@ func main() {
 
 	// 1. create unbuffered channel
 	baton := make(chan string)
+	done := make(chan struct{})
 
 	// 2. Start the Runner (Goroutine)
 	go func() {
@@ -27,6 +28,7 @@ func main() {
 		time.Sleep(1 * time.Second)
 
 		fmt.Println("Runner: Finished race.")
+		close(done)
 	}()
 
 	fmt.Println("Main: Getting ready to pass baton...")
@@ -39,7 +41,7 @@ func main() {
 
 	fmt.Println("Main: Baton passed successfully.")
 
-	// Keep main alive just long enough to see the runner finish
-	time.Sleep(2 * time.Second)
+	// Wait for the runner explicitly. Do not use Sleep as synchronization.
+	<-done
 
 }
