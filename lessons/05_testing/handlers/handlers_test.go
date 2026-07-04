@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gnsalok/go-codes/ultimate-go/handlers"
+	"github.com/gnsalok/go-codes/lessons/05_testing/handlers"
 )
 
 const succeed = "\u2713"
