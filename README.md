@@ -51,8 +51,17 @@ Exercises are organized into numbered lesson directories under `lessons/` so stu
 8. `lessons/08_time` — epoch and UTC time handling.
 9. `lessons/09_performance` — benchmarking and profiling.
 10. `lessons/10_go_1_25_features` — Go 1.25-focused examples and notes.
+11. `lessons/11_package_design` — package naming, exported APIs, internal packages, and module boundaries.
+12. `lessons/12_context_services` — request-scoped cancellation, deadlines, metadata, and deterministic context tests.
+13. `lessons/13_advanced_errors` — stable error contracts, diagnostics, joined errors, and logging context.
+14. `lessons/14_http_services` — JSON APIs, middleware, validation, health checks, graceful shutdown, and `httptest`.
+15. `lessons/15_persistence_transactions` — `database/sql`, transaction boundaries, rollback patterns, and persistence tests.
+16. `lessons/16_observability` — structured logging, metrics, tracing concepts, and production profiling.
+17. `lessons/17_runtime_memory_model` — escape analysis, garbage collection, races, happens-before rules, and scheduler behavior.
+18. `lessons/18_cli_design` — flags, environment configuration, command structure, exit codes, and CLI tests.
+19. `lessons/19_advanced_generics` — constraint design, generic data structures, and API tradeoffs.
 
-Each lesson includes a `README.md` with concepts, a quick reading guide, and commands for running examples and tests. See `FUTURE_ROADMAP.md` for suggested advanced topics to add next.
+Each lesson includes a `README.md` with concepts, a quick reading guide, and commands for running examples and tests. See `ADVANCED_CURRICULUM_PLAN.md` for the implemented advanced roadmap and remaining capstone plan.
 
 ## Usage
 
