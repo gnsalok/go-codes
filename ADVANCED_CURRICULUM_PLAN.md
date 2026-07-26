@@ -13,6 +13,7 @@ This repository now includes an advanced Go learning path that moves students fr
 7. `lessons/17_runtime_memory_model` — escape analysis, allocation reduction, garbage collector behavior, data races, happens-before relationships, scheduler behavior, and goroutine lifecycle costs.
 8. `lessons/18_cli_design` — flags, environment configuration, command structure, exit codes, terminal output, and testable command behavior.
 9. `lessons/19_advanced_generics` — constraint design, generic data structures, generics versus interfaces, generics versus code generation, and avoiding over-generalized APIs.
+10. `lessons/20_file_io_buffering` — file lifecycle, `io.Reader` and `io.Writer`, buffered and streaming I/O, atomic replacement, and file-handling best practices.
 
 ## Remaining planned expansion
 

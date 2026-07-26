@@ -60,6 +60,7 @@ Exercises are organized into numbered lesson directories under `lessons/` so stu
 17. `lessons/17_runtime_memory_model` — escape analysis, garbage collection, races, happens-before rules, and scheduler behavior.
 18. `lessons/18_cli_design` — flags, environment configuration, command structure, exit codes, and CLI tests.
 19. `lessons/19_advanced_generics` — constraint design, generic data structures, and API tradeoffs.
+20. `lessons/20_file_io_buffering` — file lifecycle, streaming I/O, buffering, atomic writes, and file-handling best practices.
 
 Each lesson includes a `README.md` with concepts, a quick reading guide, and commands for running examples and tests. See `ADVANCED_CURRICULUM_PLAN.md` for the implemented advanced roadmap and remaining capstone plan.
 
