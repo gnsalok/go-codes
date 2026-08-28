@@ -26,9 +26,7 @@ Table of Contents:
     - But we can reduce those latency but without guarantees (Buffer channels). 
         - Buffers don't provide performance (Big buffer). But small buffers reduce the latency.
 
-
-
-
+- channel should always close by sender, never the receiver
 
 ``` go 
 <-ch // receive
