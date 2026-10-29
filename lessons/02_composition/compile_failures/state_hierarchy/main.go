@@ -1,4 +1,5 @@
-// This is an example of using type hierarchies with a OOP pattern.
+// This example intentionally fails to compile because Go has no subtype
+// relationship between Animal, Dog, and Cat.
 // This is not something we want to do in Go. Go does not have the
 // concept of sub-typing. All types are their own and the concepts of
 // base and derived types do not exist in Go. This pattern does not

@@ -1,5 +1,7 @@
 // Sample program demonstrating when implicit interface conversions
 // are provided by the compiler.
+// This example intentionally fails: a Mover value does not expose the Lock
+// method required by MoveLocker, even when its dynamic value is a bike.
 package main
 
 import "fmt"

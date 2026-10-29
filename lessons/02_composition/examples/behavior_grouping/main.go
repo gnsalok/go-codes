@@ -1,7 +1,7 @@
 // All material is licensed under the Apache License Version 2.0, January 2004
 // http://www.apache.org/licenses/LICENSE-2.0
 
-// This is an example of using composition and interfaces. This is
+// This example uses composition and interfaces. This is
 // something we want to do in Go. We will group common types by
 // their behavior and not by their state. This pattern does
 // provide a good design principle in a Go program.

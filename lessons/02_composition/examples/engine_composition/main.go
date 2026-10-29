@@ -7,9 +7,7 @@ type Engine interface {
 	Stop()
 }
 
-// Car embedding Engine Interface
-// Car can have its own implementation for Start and Stop
-
+// Car embeds the behavior it delegates to an Engine implementation.
 type Car struct {
 	Engine
 	Model string
@@ -20,8 +18,6 @@ func (c Car) Drive() {
 }
 
 func main() {
-
 	c := Car{}
 	c.Drive()
-
 }

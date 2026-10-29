@@ -18,17 +18,13 @@ func (u *user) String() string {
 }
 
 func main() {
-
-	// Create a value of type user.
 	u := user{
 		name:  "Bill",
 		email: "bill@gmail.com",
 	}
 
-	// Display the values.
+	// The value does not implement fmt.Stringer because String has a pointer
+	// receiver. Its address does implement the interface.
 	fmt.Println(u)
-
-	// call the custom method
-	// Type assestion always happens at Runtime.
 	fmt.Println(&u)
 }
