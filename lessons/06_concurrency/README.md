@@ -1,98 +1,108 @@
-# Lesson 06: Concurrency
+# Lesson 06: Production Concurrency
 
-Go makes concurrency easy to start, but production concurrency is about **ownership, cancellation, backpressure, and correctness**. This lesson teaches goroutines and channels as tools for building bounded, observable, and stoppable systems.
+## Learning goals
 
-## What you should be able to do after this lesson
+- Give every goroutine an owner and a finite stop path.
+- Distinguish communication, synchronization, cancellation, and resource bounds.
+- Choose among channels, mutexes, atomics, `WaitGroup`, and `errgroup`.
+- Detect leaks, races, deadlocks, swallowed errors, and unbounded concurrency.
 
-After completing the lesson, you should be able to:
+## Mental model
 
-- Start goroutines only when you know who owns them and how they stop.
-- Use channels to pass data, stream results, coordinate shutdown, and apply backpressure.
-- Use `sync.WaitGroup` to wait for completion without confusing it with communication or error handling.
-- Use `context.Context` to propagate cancellation and deadlines across goroutines and API boundaries.
-- Use worker pools and semaphores to avoid unbounded goroutine creation.
-- Choose between channels, mutexes, atomics, `WaitGroup`, and `errgroup` based on the problem.
-- Review concurrent code for leaks, races, deadlocks, swallowed errors, and unclear channel ownership.
+Concurrency is a lifecycle design problem. Before starting a goroutine, answer:
 
-## Production decision checklist
+1. Who owns it?
+2. What input keeps it alive?
+3. How does it stop on success, error, timeout, and caller cancellation?
+4. How does it report results and errors?
+5. What bounds goroutines, queued work, memory, sockets, and downstream pressure?
 
-Ask these questions before adding a goroutine:
+An unbuffered channel transfers a value and synchronizes sender with receiver. A
+buffered channel decouples them only up to its capacity; that capacity is a policy,
+not a deadlock fix. The sender that knows no more values will be produced owns
+closing the channel.
 
-1. **Who owns this goroutine?** The caller, a service, a worker pool, or the process?
-2. **How does it stop?** Channel close, context cancellation, finite input, or process shutdown?
-3. **How are errors reported?** Result channel, `errgroup`, callback, log, or returned aggregate error?
-4. **What shared state does it touch?** If state is shared, protect it with ownership transfer, a mutex, or atomic operations.
-5. **What bounds the work?** Fixed worker count, semaphore, queue size, timeout, or rate limit?
+## Decision guide
 
-| Need | Prefer |
+| Requirement | Prefer |
 | --- | --- |
-| Wait until goroutines finish | `sync.WaitGroup` |
-| Return first error and cancel sibling work | `errgroup.WithContext` |
-| Pass data or stream results | Channel |
-| Protect complex shared state | `sync.Mutex` |
-| Count simple numeric events | `sync/atomic` |
-| Cancel request-scoped work | `context.Context` |
-| Limit concurrency | Worker pool or buffered-channel semaphore |
+| Wait for independent goroutines | `sync.WaitGroup` |
+| Cancel sibling work after an error | `errgroup.WithContext` |
+| Transfer ownership or stream values | Channel |
+| Protect compound shared state | `sync.Mutex` or `sync.RWMutex` after measurement |
+| Update one numeric value | Typed atomic operation |
+| Propagate request cancellation | `context.Context` |
+| Bound parallel work | Fixed worker pool or semaphore |
 
-## Production rules
+## Reading and running order
 
-- Every goroutine must have a clear owner and a clear stop path.
-- Do not launch unbounded goroutines for unbounded input.
-- Prefer `context.Context` for cancellation across function and service boundaries.
-- Use channels for communication and coordination, not as a replacement for every shared variable.
-- Close a channel from the sending side, and only when no more values will be sent.
-- Do not close a channel just to stop one sender; use context or another explicit signal.
-- Do not use a bigger buffer to hide a deadlock. Fix the ownership and lifecycle problem.
-- Always decide what happens on success, error, timeout, cancellation, and partial completion.
-
-## Recommended reading order
-
-1. `concurrency/production/bounded_fetch.go` — a production-style example that combines context, bounded workers, channels, errors, and ordered results.
-2. `concurrency/concurrency-guide/0-concurrency-guide.md` — core mental model for buffered and unbuffered channels.
-3. `concurrency/concurrency-guide/unbuffered-synchronization.go` — rendezvous and hand-off semantics.
-4. `concurrency/concurrency-guide/buffered-decoupling.go` — buffering and backpressure.
-5. `concurrency/concurrency-guide/worker-pool-pattern.go` — fan-out/fan-in with explicit worker lifecycle.
-6. `concurrency/concurrency-guide/worker-pool-with-context.go` — cancellation and first-error propagation.
-7. `concurrency/context/` — timeouts, request cancellation, and context values.
-8. `concurrency/mutex/` — protecting shared memory with mutexes and atomics.
-9. `concurrency/Interview/` — practice patterns and discussion examples.
-10. `../notes/concurrency.md` and `../notes/channels.md` — production notes and reusable templates.
-
-## Run the lesson
-
-From the repository root:
+1. Read `concurrency/concurrency-guide/0-concurrency-guide.md`.
+2. Run the focused channel examples:
 
 ```bash
-go run ./lessons/06_concurrency/concurrency/production/bounded_fetch.go
+go run ./lessons/06_concurrency/concurrency/channels/signaling
+go run ./lessons/06_concurrency/concurrency/channels/fan_out
+go run ./lessons/06_concurrency/concurrency/channels/worker_pool
+go run ./lessons/06_concurrency/concurrency/channels/drop
+go run ./lessons/06_concurrency/concurrency/channels/cancellation
+go run ./lessons/06_concurrency/concurrency/channels/retry
 ```
 
-You can also run individual standalone examples:
+3. Compare unbuffered, buffered, and bounded designs:
 
 ```bash
-go run ./lessons/06_concurrency/concurrency/concurrency-guide/worker-pool-pattern.go
+go run ./lessons/06_concurrency/concurrency/concurrency-guide/unbuffered_synchronization
+go run ./lessons/06_concurrency/concurrency/concurrency-guide/buffered_decoupling
+go run ./lessons/06_concurrency/concurrency/concurrency-guide/worker_pool
+go run ./lessons/06_concurrency/concurrency/concurrency-guide/worker_pool_with_context
 ```
 
-For directories with multiple standalone `main` functions, run the specific file you want to study.
+4. Study `concurrency/production/bounded_fetch.go`, which combines bounded work,
+   ordered partial results, cancellation, and error joining.
+5. Use [EXERCISES.md](EXERCISES.md) to change one constraint at a time.
 
-## Run tests and checks
+## Focused verification
 
-This lesson currently has standalone `main` programs rather than package-level tests. Check specific examples with `go run`, and check package compilation where applicable:
+Every directory now contains one package instead of unrelated `main` functions:
 
 ```bash
-go test ./lessons/06_concurrency/...
+go test ./lessons/06_concurrency/concurrency/channels/...
+go test ./lessons/06_concurrency/concurrency/concurrency-guide/...
+go test ./lessons/06_concurrency/concurrency/context/...
+go test ./lessons/06_concurrency/concurrency/mutex/...
+go test -race ./lessons/06_concurrency/concurrency/mutex/...
 ```
 
-## Production confidence checklist
+The HTTP request demonstrations make real network calls and are not part of the
+deterministic test set.
 
-Before shipping concurrent Go code, verify:
+## Production tradeoffs and common mistakes
 
-- [ ] Every goroutine has an owner.
-- [ ] Every goroutine exits on success, error, cancellation, or closed input.
-- [ ] Blocking sends and receives cannot leak after the caller gives up.
-- [ ] Channels have one clear closing owner.
-- [ ] Worker counts and queue sizes are bounded by real constraints.
-- [ ] Shared mutable state is protected or avoided.
-- [ ] Errors are returned, joined, or intentionally handled.
-- [ ] Context deadlines and cancellation are respected by I/O calls.
-- [ ] The code is understandable without relying on `time.Sleep` for synchronization.
-- [ ] The race detector is used when changing concurrent code.
+- A goroutine blocked on an abandoned send or receive is a leak even if it consumes
+  little CPU.
+- Launching one goroutine per unbounded input shifts overload into memory, sockets,
+  or a downstream service.
+- Closing a channel broadcasts “no more values”; it is not a general request for
+  one producer to stop.
+- A larger buffer changes latency and overload policy. It does not repair unclear
+  ownership.
+- `RWMutex` can be slower than `Mutex`; choose it from contention measurements.
+- Never copy a mutex, atomic value, or type that contains one after first use.
+- Avoid `time.Sleep` as synchronization in tests. Wait for a state transition.
+
+## Interview prompts
+
+1. How would you prove a worker pool cannot leak after its caller cancels?
+2. Who should close a results channel with multiple worker senders?
+3. What does a channel buffer size mean operationally?
+4. When would a mutex be clearer than a channel?
+5. How would you preserve input ordering while processing concurrently?
+
+## Confidence checklist
+
+- [ ] Every goroutine has a named owner and stop path.
+- [ ] Work and queues are bounded by an explicit constraint.
+- [ ] Blocking sends and receives observe caller cancellation where necessary.
+- [ ] One sender owns each channel close.
+- [ ] Errors and partial results have a documented policy.
+- [ ] Concurrent tests pass with the race detector.

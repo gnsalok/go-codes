@@ -10,33 +10,23 @@ import (
 	"sync/atomic"
 )
 
-// counter is a variable incremented by all goroutines.
-
 var counter int64
 
 func main() {
+	const goroutines = 2
 
-	// Number of goroutines to use.
-	const grs = 2
-
-	// wg is used to manage concurrency.
 	var wg sync.WaitGroup
-	wg.Add(grs)
+	wg.Add(goroutines)
 
-	// Create two goroutines.
-	for g := 0; g < grs; g++ {
+	for range goroutines {
 		go func() {
+			defer wg.Done()
 			for i := 0; i < 2; i++ {
 				atomic.AddInt64(&counter, 1)
 			}
-
-			wg.Done()
 		}()
 	}
 
-	// Wait for the goroutines to finish.
 	wg.Wait()
-
-	// Display the final value.
 	fmt.Println("Final Counter:", counter)
 }
