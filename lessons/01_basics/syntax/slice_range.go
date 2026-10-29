@@ -3,32 +3,21 @@ package main
 import "fmt"
 
 func main() {
-
-	// Slice will give mechanical sympathy to HW
-	// Slice provides predictable access patter ; Row Major contiguous memory allocation and access
-
 	friends := []string{"Ani", "Donnie", "tonie", "sonie"}
 
-	/*
-		Very Important:
-		- When we are ranging over slice i.e. friends and getting value "v" - we are working on copy (value semantic) of the data.
-		- OTOH, when we do "for i := range friends" - we are working on pointer semantic, there modifying friend[:2] inside
-		  loop, modify the actual array.
-	*/
-
-	// This will work fine
-	// Value semantic
-	for _, v := range friends {
+	// range copies the original slice header before the loop starts. The values
+	// therefore remain available even though friends is shortened in the body.
+	for _, friend := range friends {
 		friends = friends[:2]
-		fmt.Printf("%v\n", v)
+		fmt.Println(friend)
 	}
 
-	// out of range as L#25 modifies the actual slice
+	// This loop intentionally panics when i reaches 2: the range still produces
+	// indexes from the original length, but indexing uses the shortened slice.
 	friends = []string{"Ani", "Donnie", "tonie", "sonie"}
 
 	for i := range friends {
 		friends = friends[:2]
-		fmt.Printf("%v\n", friends[i])
+		fmt.Println(friends[i])
 	}
-
 }

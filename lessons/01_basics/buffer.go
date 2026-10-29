@@ -12,14 +12,14 @@ func main() {
 
 	// The buffered writer temporarily holds small writes in memory.
 	writer := bufio.NewWriter(&destination)
-	writer.WriteString("Hello, ")
-	writer.WriteString("Go!")
+	_, _ = writer.WriteString("Hello, ")
+	_, _ = writer.WriteString("Go!")
 
 	fmt.Println("Before Flush:", destination.String()) // Empty
 	fmt.Println("Bytes waiting in buffer:", writer.Buffered())
 
 	// Flush sends the buffered data to the destination.
-	writer.Flush()
+	_ = writer.Flush()
 
 	fmt.Println("After Flush:", destination.String()) // Hello, Go!
 }

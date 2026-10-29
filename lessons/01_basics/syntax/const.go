@@ -1,18 +1,13 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
+	// An untyped constant is given a concrete type only when its context
+	// requires one. A typed constant always keeps its declared type.
+	const circumferenceRatio = 3.14 * 3
+	const fixedInteger int = 3
 
-	// Compiler can perform implicit conversion on Untyped constant
-	// Untyped Constant
-	const PI = 3.14 * 3 // Constant of kind
-
-	// Typed Constant
-	const fixInt int = 3 // type : int
-
-	fmt.Println(fixInt)
-	fmt.Println(PI)
+	fmt.Println(fixedInteger)
+	fmt.Println(circumferenceRatio)
 }
