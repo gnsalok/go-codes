@@ -1,30 +1,75 @@
-# Lesson 03: Interfaces and Decoupling
+# Lesson 03: Interfaces, Method Sets, and Decoupling
 
-## Core Go concepts
+## Learning goals
 
-- Defining behavior with small interfaces.
-- Understanding method-set semantics and mixed receiver choices.
-- Avoiding interface pollution by accepting concrete types until abstraction is needed.
-- Using embedding and functions to decouple call sites from implementation details.
+- Describe an interface value as a dynamic type and dynamic value.
+- Determine the method sets of `T` and `*T` without compiling the program.
+- Place interfaces at consumer boundaries and avoid interface pollution.
+- Explain when a function value is a simpler dependency than an interface.
 
-## Quick reading
+## Mental model
 
-The `interface/` examples focus on method semantics and common pitfalls. The `interface/inteface_pollution/` examples contrast over-abstracted code with a cleaner implementation. The `decoupling/` examples show several ways to separate behavior: embedded types, function values, interface contracts, and method receiver decisions. Read the accompanying markdown note in `decoupling/` before changing these examples.
+Interfaces are satisfied implicitly. The method set of `T` contains methods with
+receiver `T`; the method set of `*T` contains methods with receiver `T` or `*T`.
+The compiler may take an address for an ordinary call on an addressable value, but
+that convenience does not change which interfaces the value implements.
 
-## Run the lesson
+Choose receiver semantics from the meaning of the type. Use pointer receivers when
+methods mutate the value, copying is unsafe or expensive, or identity matters. Use
+value receivers for small values whose methods naturally operate on copies. Keep
+the choice consistent across a type's method set.
 
-From the repository root:
-
-```bash
-go run ./lessons/03_interfaces_and_decoupling/decoupling/embedding.go
-```
-
-Use file-specific `go run` commands for directories that contain multiple standalone `main` examples.
-
-## Run tests
-
-This lesson currently has no `_test.go` files, but package compilation can be checked with:
+## Runnable examples
 
 ```bash
-go test ./lessons/03_interfaces_and_decoupling/...
+go run ./lessons/03_interfaces_and_decoupling/examples/interfaces
+go run ./lessons/03_interfaces_and_decoupling/examples/method_value
+go run ./lessons/03_interfaces_and_decoupling/examples/receiver_semantics
+go run ./lessons/03_interfaces_and_decoupling/examples/embedding
+go test ./lessons/03_interfaces_and_decoupling/examples/...
 ```
+
+The interface-pollution progression compares an unnecessary package-owned
+interface with a concrete return type:
+
+```bash
+go run ./lessons/03_interfaces_and_decoupling/progression/interface_pollution/problem
+go run ./lessons/03_interfaces_and_decoupling/progression/interface_pollution/solution
+```
+
+## Intentional compiler failures
+
+- `compile_failures/addressability` calls a pointer-receiver method on a conversion
+  result, which is not addressable.
+- `compile_failures/method_set` passes a `user` value where the interface requires
+  a method declared only on `*user`.
+
+```bash
+go run ./lessons/03_interfaces_and_decoupling/compile_failures/addressability
+go run ./lessons/03_interfaces_and_decoupling/compile_failures/method_set
+```
+
+## Production tradeoffs and common mistakes
+
+- An interface with no concrete need for substitution adds indirection without
+  decoupling anything.
+- A typed nil pointer stored in an interface makes the interface itself non-nil.
+- Returning a package-owned interface can hide useful concrete capabilities and
+  makes future API evolution harder.
+- Large interfaces force unrelated implementations to depend on unrelated methods.
+- A method value with a value receiver captures a copy when the method value is
+  created; a pointer receiver captures access to the original value.
+
+## Interview prompts
+
+1. Why can `value.Method()` compile while `value` still fails an interface check?
+2. When is a one-method interface better than a function parameter, and when is it
+   not?
+3. How do you detect and avoid a typed-nil interface bug?
+4. What is lost when a constructor returns an interface instead of a concrete type?
+
+## Practice
+
+Refactor a service that owns a large repository interface so each consumer declares
+only the behavior it calls. Use a fake implementation in a test and explain why the
+interface belongs to the consumer.

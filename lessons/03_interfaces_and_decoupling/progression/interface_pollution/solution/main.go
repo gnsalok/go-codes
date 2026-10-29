@@ -1,4 +1,4 @@
-// This is an example that removes the interface pollution by
+// This example removes interface pollution by
 // removing the interface and using the concrete type directly.
 package main
 

@@ -1,6 +1,6 @@
-// https://github.com/gnsalok/gotraining/blob/master/topics/go/design/composition/pollution/example1/example1.go
+// Source: https://github.com/gnsalok/gotraining/blob/master/topics/go/design/composition/pollution/example1/example1.go
 
-// This is an example that creates interface pollution
+// This example creates interface pollution
 // by improperly using an interface when one is not needed.
 package main
 

@@ -1,3 +1,4 @@
+// This example intentionally fails because a conversion result is not addressable.
 package main
 
 import "fmt"
