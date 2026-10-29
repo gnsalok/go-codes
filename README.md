@@ -62,7 +62,7 @@ work, record a benchmark before changing the implementation.
 | [17](lessons/17_runtime_memory_model/README.md) | Runtime and memory | Happens-before, races, scheduling, GC, and escape analysis |
 | [18](lessons/18_cli_design/README.md) | CLI design | Testable boundaries, streams, and exit codes |
 | [19](lessons/19_advanced_generics/README.md) | Advanced generics | Generic data structures and API tradeoffs |
-| [20](lessons/20_file_io_buffering/notes.md) | File I/O | Streaming, buffering, lifecycle, and atomic replacement |
+| [20](lessons/20_file_io_buffering/README.md) | File I/O | Streaming, buffering, lifecycle, and atomic replacement |
 | [21](lessons/21_closures/README.md) | Closures | Captured state, middleware, and concurrency hazards |
 
 ## Interview practice loop
