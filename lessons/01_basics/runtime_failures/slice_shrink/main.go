@@ -1,3 +1,4 @@
+// This program intentionally ends with an index-out-of-range panic.
 package main
 
 import "fmt"

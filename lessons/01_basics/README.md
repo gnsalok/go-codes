@@ -17,23 +17,21 @@ positions are different concepts.
 
 ## Examples
 
-Run examples as individual files because `syntax/` contains several independent
-`main` functions:
-
 ```bash
-go run ./lessons/01_basics/syntax/var.go
-go run ./lessons/01_basics/syntax/maps.go
-go run ./lessons/01_basics/buffer.go
+go run ./lessons/01_basics/examples/variables
+go run ./lessons/01_basics/examples/maps
+go run ./lessons/01_basics/examples/buffering
+go test ./lessons/01_basics/examples/...
 ```
 
-`slice_range.go` intentionally ends with an index-out-of-range panic. Predict the
+The runtime-failure example intentionally ends with an index-out-of-range panic. Predict the
 printed values and the failing index before running it:
 
 ```bash
-go run ./lessons/01_basics/syntax/slice_range.go
+go run ./lessons/01_basics/runtime_failures/slice_shrink
 ```
 
-Read [runes.md](syntax/runes.md) before implementing text-processing code.
+Read [runes.md](runes.md) before implementing text-processing code.
 
 ## Production tradeoffs and common mistakes
 
