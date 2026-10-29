@@ -24,6 +24,20 @@ The pprof program intentionally retains per-request data in a global map. Genera
 traffic against `/process`, capture multiple heap profiles, and compare retained
 allocations over time. Do not expose pprof endpoints publicly without access controls.
 
+```bash
+# In one terminal:
+go run ./lessons/09_performance/pprof
+
+# After generating local traffic, inspect retained heap objects:
+go tool pprof http://localhost:8080/debug/pprof/heap
+
+# Compare two snapshots to distinguish sustained growth from a warm cache:
+go tool pprof -base before.pb.gz after.pb.gz
+```
+
+Inside pprof, start with `top`, then use `list <function>` to connect a cost to
+source. Use the web UI only on a loopback address, for example `-http=:8081`.
+
 ## Production tradeoffs and common mistakes
 
 - A microbenchmark can optimize code that is irrelevant to end-to-end latency.

@@ -103,6 +103,7 @@ an explanation of failure handling.
   material.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the change workflow.
+Curated primary sources and attribution are in [REFERENCES.md](REFERENCES.md).
 
 ## License
 

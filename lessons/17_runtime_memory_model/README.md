@@ -21,6 +21,16 @@ go test -race ./lessons/17_runtime_memory_model
 - Reducing allocations can increase retention or complexity; profile first.
 - Goroutine stacks grow, but goroutines still consume memory and scheduler work.
 
+| Shared-state requirement | Starting point |
+| --- | --- |
+| One invariant across several fields | `sync.Mutex` |
+| Read-heavy state with measured reader contention | `sync.RWMutex` |
+| Independent keys with write-once or disjoint-key workloads | Consider `sync.Map` |
+| One numeric state transition | Typed `sync/atomic` operation |
+
+`sync.Map` is specialized, not a general replacement for `map` plus a mutex. Prefer
+the ordinary map when its type safety and compound invariants make ownership clearer.
+
 ## Interview prompts and practice
 
 1. Which channel and mutex operations establish happens-before relationships?

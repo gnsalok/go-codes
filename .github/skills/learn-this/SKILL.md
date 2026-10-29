@@ -1,32 +1,35 @@
 ---
 name: learn-this
-description: 'Learn the codebase instantly for feature development in the go-codes repository. Use when: starting work on new features, understanding project structure, or needing context for development tasks.'
-argument-hint: 'Optional: specify focus area like "concurrency", "errors", or "generics"'
+description: Learn the structure, conventions, and verification model of the go-codes senior interview curriculum.
+argument-hint: Optional lesson number or topic, such as concurrency, errors, or generics
 ---
 
 # Learn This Codebase
 
-## When to Use
+## Start here
 
-- Starting development on a new feature in the go-codes repository
-- Understanding the overall structure and key components
-- Getting context for bug fixes or enhancements
-- Before making changes to unfamiliar parts of the codebase
+1. Read the root `README.md` for the curriculum map and repository conventions.
+2. Read the target lesson's README before its Go files.
+3. Classify each relevant directory as a runnable example, tested package, design
+   progression, or intentional compiler failure.
+4. Use the focused commands in the lesson README. Do not use `go test ./...` as a
+   success gate because compiler failures are retained as teaching material.
 
-## Procedure
+## Repository shape
 
-1. **Explore the repository structure**: Use the Explore subagent to get an overview of the codebase, including main directories, key files, and project organization.
+- `lessons/01_basics` through `lessons/21_closures` form the ordered curriculum.
+- `examples/` contains runnable demonstrations.
+- `progression/` compares versions of a design.
+- `compile_failures/` contains source that must fail for a documented reason.
+- Tested production-design packages are concentrated in Lessons 11–21.
+- `REFERENCES.md` contains primary sources and attribution.
 
-2. **Identify key components**: Focus on understanding the main packages, interfaces, and patterns used in the project, such as concurrency patterns, error handling, generics, etc.
+## Change discipline
 
-3. **Gather context for specific areas**: If a focus area is specified, dive deeper into that topic using semantic search and file reading.
-
-4. **Enable feature development**: With the gathered knowledge, provide guidance or implement features as requested.
-
-## Resources
-
-- [Repository README](README.md) - Overview of the project
-- [Go modules](go.mod) - Dependencies and module structure
-- Key directories: `ultimate-go/`, `new-in-go/`, etc.
-
-This skill ensures the agent has comprehensive knowledge of the codebase to assist with feature development effectively.
+- Preserve runnable behavior unless the lesson contains a technical error.
+- Keep intentional failures isolated so unrelated redeclarations do not obscure the
+  expected diagnostic.
+- Prefer lesson-sized changes and focused verification.
+- Run `gofmt`, `go vet`, and the lesson's tests; use `go test -race` for shared-memory
+  and concurrency changes.
+- Keep tests offline and deterministic.
