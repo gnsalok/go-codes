@@ -1,14 +1,12 @@
-package handlers
-
-import "net/http"
-
 // All material is licensed under the Apache License Version 2.0, January 2004
 // http://www.apache.org/licenses/LICENSE-2.0
 
 // Package handlers provides the endpoints for the web service.
+package handlers
 
 import (
 	"encoding/json"
+	"net/http"
 )
 
 // Routes sets the routes for the web service.
@@ -27,6 +25,6 @@ func SendJSON(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(200)
-	json.NewEncoder(rw).Encode(&u)
+	rw.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(rw).Encode(&u)
 }

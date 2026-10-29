@@ -1,44 +1,55 @@
-// Sample test to show how to write a basic unit table test.
 package main
 
 import (
+	"io"
 	"net/http"
+	"strings"
 	"testing"
 )
 
-const succeed = "\u2713"
-const failed = "\u2717"
+type roundTripFunc func(*http.Request) (*http.Response, error)
 
-// TestDownload validates the http Get function can download content and
-// handles different status conditions properly.
-func TestDownload(t *testing.T) {
-	tt := []struct {
-		url        string
-		statusCode int
-	}{
-		{"https://www.ardanlabs.com/blog/index.xml", http.StatusOK},
-		{"http://rss.cnn.com/rss/cnn_topstorie.rss", http.StatusNotFound},
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+func TestDownloadStatuses(t *testing.T) {
+	client := &http.Client{
+		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			status := http.StatusNotFound
+			if req.URL.Path == "/feed" {
+				status = http.StatusOK
+			}
+
+			return &http.Response{
+				StatusCode: status,
+				Body:       io.NopCloser(strings.NewReader("test response")),
+				Header:     make(http.Header),
+				Request:    req,
+			}, nil
+		}),
 	}
 
-	t.Log("Given the need to test downloading different content.")
-	{
-		for testID, test := range tt {
-			t.Logf("\tTest %d:\tWhen checking %q for status code %d", testID, test.url, test.statusCode)
-			{
-				resp, err := http.Get(test.url)
-				if err != nil {
-					t.Fatalf("\t%s\tTest %d:\tShould be able to make the Get call : %v", failed, testID, err)
-				}
-				t.Logf("\t%s\tTest %d:\tShould be able to make the Get call.", succeed, testID)
+	tests := []struct {
+		name       string
+		url        string
+		wantStatus int
+	}{
+		{name: "existing feed", url: "https://example.test/feed", wantStatus: http.StatusOK},
+		{name: "missing feed", url: "https://example.test/missing", wantStatus: http.StatusNotFound},
+	}
 
-				defer resp.Body.Close()
-
-				if resp.StatusCode == test.statusCode {
-					t.Logf("\t%s\tTest %d:\tShould receive a %d status code.", succeed, testID, test.statusCode)
-				} else {
-					t.Errorf("\t%s\tTest %d:\tShould receive a %d status code : %v", failed, testID, test.statusCode, resp.StatusCode)
-				}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			response, err := client.Get(test.url)
+			if err != nil {
+				t.Fatalf("GET %q: %v", test.url, err)
 			}
-		}
+			defer response.Body.Close()
+
+			if response.StatusCode != test.wantStatus {
+				t.Fatalf("status = %d, want %d", response.StatusCode, test.wantStatus)
+			}
+		})
 	}
 }

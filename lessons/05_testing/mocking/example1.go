@@ -10,7 +10,7 @@ import "github.com/gnsalok/go-codes/lessons/05_testing/mocking/pubsub"
 // publisher is an interface to allow this package to mock the pubsub
 // package support.
 type publisher interface {
-	Publish(key string, v interface{}) error
+	Publish(key string, value any) error
 	Subscribe(key string) error
 }
 
@@ -18,7 +18,7 @@ type publisher interface {
 type mock struct{}
 
 // Publish implements the publisher interface for the mock.
-func (m *mock) Publish(key string, v interface{}) error {
+func (m *mock) Publish(key string, value any) error {
 
 	// ADD YOUR MOCK FOR THE PUBLISH CALL.
 	return nil
@@ -32,20 +32,14 @@ func (m *mock) Subscribe(key string) error {
 }
 
 func main() {
-
-	// Create a slice of publisher interface values. Assign
-	// the address of a pubsub.PubSub value and the address of
-	// a mock value.
 	pubs := []publisher{
 		pubsub.New("localhost"),
 		&mock{},
 	}
 
-	// Range over the interface value to see how the publisher
-	// interface provides the level of decoupling the user needs.
-	// The pubsub package did not need to provide the interface type.
-	for _, p := range pubs {
-		p.Publish("key", "value")
-		p.Subscribe("key")
+	// The consumer owns the interface; pubsub does not need to declare it.
+	for _, publisher := range pubs {
+		_ = publisher.Publish("key", "value")
+		_ = publisher.Subscribe("key")
 	}
 }

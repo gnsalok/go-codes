@@ -1,97 +1,86 @@
 package subtest
 
 import (
+	"io"
 	"net/http"
+	"strings"
 	"testing"
 )
 
-// go test -v
-// go test -run TestDownload/statusok -v
-// go test -run TestDownload/statusnotfound -v
-// go test -run TestParallelize -v
+type roundTripFunc func(*http.Request) (*http.Response, error)
 
-const succeed = "\u2713"
-const failed = "\u2717"
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
 
-// TestDownload validates the http Get function can download content and
-// handles different status conditions properly.
-func TestDownload(t *testing.T) {
-	tt := []struct {
-		name       string
-		url        string
-		statusCode int
-	}{
-		{"statusok", "https://www.ardanlabs.com/blog/index.xml", http.StatusOK},
-		{"statusnotfound", "http://rss.cnn.com/rss/cnn_topstorie.rss", http.StatusNotFound},
-	}
-
-	t.Log("Given the need to test downloading different content.")
-	{
-		for testID, test := range tt {
-			testID, test := testID, test
-			tf := func(t *testing.T) {
-				t.Logf("\tTest %d:\tWhen checking %q for status code %d", testID, test.url, test.statusCode)
-				{
-					resp, err := http.Get(test.url)
-					if err != nil {
-						t.Fatalf("\t%s\tTest %d:\tShould be able to make the Get call : %v", failed, testID, err)
-					}
-					t.Logf("\t%s\tTest %d:\tShould be able to make the Get call.", succeed, testID)
-
-					defer resp.Body.Close()
-
-					if resp.StatusCode == test.statusCode {
-						t.Logf("\t%s\tTest %d:\tShould receive a %d status code.", succeed, testID, test.statusCode)
-					} else {
-						t.Errorf("\t%s\tTest %d:\tShould receive a %d status code : %v", failed, testID, test.statusCode, resp.StatusCode)
-					}
-				}
+func newStatusClient() *http.Client {
+	return &http.Client{
+		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			status := http.StatusNotFound
+			if req.URL.Path == "/feed" {
+				status = http.StatusOK
 			}
 
-			t.Run(test.name, tf)
-		}
+			return &http.Response{
+				StatusCode: status,
+				Body:       io.NopCloser(strings.NewReader("test response")),
+				Header:     make(http.Header),
+				Request:    req,
+			}, nil
+		}),
 	}
 }
 
-// TestParallelize validates the http Get function can download content and
-// handles different status conditions properly but runs the tests in parallel.
-func TestParallelize(t *testing.T) {
-	type tableTest struct {
+func TestDownload(t *testing.T) {
+	client := newStatusClient()
+	tests := []struct {
 		name       string
 		url        string
-		statusCode int
+		wantStatus int
+	}{
+		{name: "existing feed", url: "https://example.test/feed", wantStatus: http.StatusOK},
+		{name: "missing feed", url: "https://example.test/missing", wantStatus: http.StatusNotFound},
 	}
 
-	tt := []tableTest{
-		{"statusok", "https://www.ardanlabs.com/blog/index.xml", http.StatusOK},
-		{"statusnotfound", "http://rss.cnn.com/rss/cnn_topstorie.rss", http.StatusNotFound},
-	}
-
-	t.Log("Given the need to test downloading different content.")
-	{
-		for testID, test := range tt {
-			testID, test := testID, test
-			tf := func(t *testing.T) {
-				t.Parallel()
-
-				t.Logf("\tTest %d:\tWhen checking %q for status code %d", testID, test.url, test.statusCode)
-				{
-					resp, err := http.Get(test.url)
-					if err != nil {
-						t.Fatalf("\t%s\tTest %d:\tShould be able to make the Get call : %v", failed, testID, err)
-					}
-					t.Logf("\t%s\tTest %d:\tShould be able to make the Get call.", succeed, testID)
-
-					defer resp.Body.Close()
-
-					if resp.StatusCode == test.statusCode {
-						t.Logf("\t%s\tTest %d:\tShould receive a %d status code.", succeed, testID, test.statusCode)
-					} else {
-						t.Errorf("\t%s\tTest %d:\tShould receive a %d status code : %v", failed, testID, test.statusCode, resp.StatusCode)
-					}
-				}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			response, err := client.Get(test.url)
+			if err != nil {
+				t.Fatalf("GET %q: %v", test.url, err)
 			}
-			t.Run(test.name, tf)
-		}
+			defer response.Body.Close()
+
+			if response.StatusCode != test.wantStatus {
+				t.Fatalf("status = %d, want %d", response.StatusCode, test.wantStatus)
+			}
+		})
+	}
+}
+
+func TestDownloadInParallel(t *testing.T) {
+	client := newStatusClient()
+	tests := []struct {
+		name       string
+		url        string
+		wantStatus int
+	}{
+		{name: "existing feed", url: "https://example.test/feed", wantStatus: http.StatusOK},
+		{name: "missing feed", url: "https://example.test/missing", wantStatus: http.StatusNotFound},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			response, err := client.Get(test.url)
+			if err != nil {
+				t.Fatalf("GET %q: %v", test.url, err)
+			}
+			defer response.Body.Close()
+
+			if response.StatusCode != test.wantStatus {
+				t.Fatalf("status = %d, want %d", response.StatusCode, test.wantStatus)
+			}
+		})
 	}
 }

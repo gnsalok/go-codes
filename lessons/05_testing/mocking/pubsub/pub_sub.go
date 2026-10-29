@@ -24,7 +24,7 @@ func New(host string) *PubSub {
 }
 
 // Publish sends the data for the specified key.
-func (ps *PubSub) Publish(key string, v interface{}) error {
+func (ps *PubSub) Publish(key string, value any) error {
 
 	// PRETEND THERE IS A SPECIFIC IMPLEMENTATION.
 	return nil
