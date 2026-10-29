@@ -1,39 +1,29 @@
-# Lesson 19: Generics Beyond the Basics
+# Lesson 19: Generic Data Structures and API Tradeoffs
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Designing constraints that describe required operations without overfitting.
-- Building generic data structures with clear ownership and zero-value behavior.
-- Comparing generics, interfaces, and code generation.
-- Preserving readability while removing meaningful duplication.
-- Avoiding over-generalized APIs that are harder to use than concrete code.
-
-## Quick reading
-
-Generics are most useful when the same algorithm or data structure works across multiple concrete types while preserving type safety. Constraints should be as small as possible: require only the operations the generic code actually performs. If behavior is best expressed through methods, an interface may be clearer. If performance or generated specialization is required, code generation may still be appropriate.
-
-Start with `lessons/07_generics`, then use this lesson to evaluate API design tradeoffs. Ask whether a type parameter makes the caller's code simpler. If not, concrete functions or interfaces may be better.
-
-## Suggested exercises
-
-1. Write a generic stack or queue with useful zero-value behavior.
-2. Design a constraint for ordered values and compare it with a callback-based API.
-3. Rewrite an interface-based helper as a generic function, then compare readability.
-4. Identify an over-generalized API and simplify it.
-5. Add table-driven tests for multiple concrete instantiations.
-
-## Run the lesson
-
-The `stack.go` example implements a zero-value-friendly generic stack. From the repository root:
+Generic containers should preserve static types, have useful zero values, and avoid
+retaining removed values in their backing storage. Constraints expose only the
+operations an algorithm requires. A type parameter should make the caller's code
+simpler; otherwise concrete code or a behavior-oriented interface is often clearer.
 
 ```bash
-go test ./lessons/19_advanced_generics/...
+go test ./lessons/19_advanced_generics
 ```
 
-## Run tests
+The stack clears a removed slot before shortening its slice so pointer-containing
+values can be reclaimed even while the backing array remains allocated.
 
-Run the example tests and package compilation check with:
+## Tradeoffs and common mistakes
 
-```bash
-go test ./lessons/19_advanced_generics/...
-```
+- Zero-value-friendly containers reduce constructor ceremony.
+- Returning `(T, bool)` avoids inventing a sentinel for arbitrary `T`.
+- Generic APIs can increase binary code and documentation surface.
+- Do not expose the backing slice unless callers are meant to share mutation and
+  retention behavior.
+
+## Interview prompts and practice
+
+1. Why does `Pop` clear an element that is already outside the slice length?
+2. When would an iterator be safer than returning a slice?
+3. Implement a generic queue, then document its zero value and memory-retention policy.

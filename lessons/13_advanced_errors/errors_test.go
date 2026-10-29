@@ -19,3 +19,11 @@ func TestChargeReturnsTypedValidationError(t *testing.T) {
 		t.Fatalf("Charge() error = %v; want card_id ValidationError", err)
 	}
 }
+
+func TestChargeRejectsNonPositiveAmount(t *testing.T) {
+	err := Charge("card", 0)
+	var validation ValidationError
+	if !errors.As(err, &validation) || validation.Field != "amount_cents" {
+		t.Fatalf("Charge() error = %v; want amount_cents ValidationError", err)
+	}
+}

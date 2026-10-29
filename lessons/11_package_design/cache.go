@@ -12,6 +12,9 @@ func NewCache() *Cache {
 
 // Set records a value for key.
 func (c *Cache) Set(key, value string) {
+	if c.items == nil {
+		c.items = make(map[string]string)
+	}
 	c.items[key] = value
 }
 

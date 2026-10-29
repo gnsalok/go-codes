@@ -11,7 +11,7 @@ const (
 	ExitUsage = 2
 )
 
-func Run(args []string, stdout io.Writer, stderr io.Writer) int {
+func Run(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("greet", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	name := fs.String("name", "", "name to greet")

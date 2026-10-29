@@ -11,3 +11,12 @@ func TestCacheStoresValuesBehindSmallAPI(t *testing.T) {
 		t.Fatalf("Get() = %q, %v; want %q, true", got, ok, "go")
 	}
 }
+
+func TestCacheZeroValueIsReadyToUse(t *testing.T) {
+	var cache Cache
+	cache.Set("language", "go")
+
+	if got, ok := cache.Get("language"); !ok || got != "go" {
+		t.Fatalf("Get() = %q, %v; want %q, true", got, ok, "go")
+	}
+}

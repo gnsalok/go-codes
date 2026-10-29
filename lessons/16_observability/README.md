@@ -1,41 +1,28 @@
 # Lesson 16: Observability
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Writing structured logs that help operators answer questions quickly.
-- Defining metrics, service-level indicators, and service-level objectives.
-- Understanding distributed tracing concepts and request correlation.
-- Profiling CPU, heap, goroutine, and mutex contention.
-- Connecting observability signals without overwhelming the codebase.
-
-## Quick reading
-
-Observability helps you understand a running system from the outside. Logs explain discrete events, metrics show trends and health, traces connect work across service boundaries, and profiles reveal resource costs inside a process. Good observability starts with clear questions: is the service available, is it fast enough, and what changed when it became unhealthy?
-
-Prefer structured logs over free-form strings for operational events. Use metrics for counts, durations, queue lengths, and resource usage. Use traces to follow request paths through multiple components. Use profiling when you need evidence about CPU, memory, goroutines, blocking, or mutex contention.
-
-Review `lessons/09_performance` and `lessons/notes/pprof.md` before this lesson.
-
-## Suggested exercises
-
-1. Replace ad-hoc log messages with structured key-value logging.
-2. Define service-level indicators for a simple HTTP API.
-3. Add request correlation fields to logs and handler responses.
-4. Capture a CPU or heap profile from a small benchmark.
-5. Explain when a metric is better than a log line.
-
-## Run the lesson
-
-The `observability.go` example records structured request fields and separates status classification from logging. From the repository root:
+Logs explain events, metrics show aggregate behavior, traces connect work across
+boundaries, and profiles explain resource use inside a process. Start with an
+operational question—availability, latency, correctness, or saturation—then choose
+the signal that answers it with controlled cardinality and cost.
 
 ```bash
-go test ./lessons/16_observability/...
+go test ./lessons/16_observability
 ```
 
-## Run tests
+## Tradeoffs and common mistakes
 
-Run the example tests and package compilation check with:
+- High-cardinality labels such as user IDs can make metrics expensive or unusable.
+- Logs need stable field names and appropriate redaction; never emit secrets or
+  unrestricted personal data.
+- Sampling reduces trace cost but can hide rare failures unless policy accounts for
+  error and latency signals.
+- A 3xx response is not a 2xx success; the example names their combined classification
+  explicitly as `IsSuccessOrRedirect`.
 
-```bash
-go test ./lessons/16_observability/...
-```
+## Interview prompts and practice
+
+1. Define RED metrics for the greeting handler in Lesson 14.
+2. Where would you attach a request ID and how would it cross service boundaries?
+3. Add a test `slog.Handler` and assert structured fields rather than formatted text.

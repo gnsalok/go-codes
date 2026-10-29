@@ -20,6 +20,7 @@ func LogRequest(ctx context.Context, logger *slog.Logger, stats RequestStats) {
 	)
 }
 
-func IsSuccessful(status int) bool {
+// IsSuccessOrRedirect reports whether status is a 2xx or 3xx response.
+func IsSuccessOrRedirect(status int) bool {
 	return status >= 200 && status < 400
 }

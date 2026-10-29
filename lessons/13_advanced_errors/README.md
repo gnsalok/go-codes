@@ -1,38 +1,27 @@
-# Lesson 13: Advanced Error Design
+# Lesson 13: Stable Error Contracts
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Creating stable domain error contracts for callers.
-- Separating user-facing messages from operational diagnostics.
-- Wrapping errors while preserving programmatic inspection.
-- Joining multiple errors and reporting partial failures.
-- Logging errors without losing chain context.
-
-## Quick reading
-
-Start with `lessons/04_errors`, then use this lesson to think about errors as API contracts. A caller should be able to make safe decisions with `errors.Is` or `errors.As` without depending on fragile string comparisons. Error messages can change; error contracts should remain stable.
-
-Keep user-facing messages separate from internal diagnostics. For example, an HTTP handler may return a short validation message to a client while logging the wrapped database or network error for operators. When multiple independent operations fail, `errors.Join` can preserve all failures while still allowing callers to inspect the combined error.
-
-## Suggested exercises
-
-1. Define sentinel domain errors and wrap them with operation-specific context.
-2. Create a typed validation error that exposes fields for callers but keeps formatting flexible.
-3. Use `errors.Join` to report partial failures from a batch operation.
-4. Write a logging helper that records the full error chain without replacing the original error.
-
-## Run the lesson
-
-The `errors.go` example demonstrates stable domain errors, typed validation errors, and wrapped operational context. From the repository root:
+Callers need stable facts, while operators need diagnostic context. Sentinels expose
+identity, typed errors expose structured fields, and `%w` preserves those contracts
+through higher-level operations. User-facing messages and internal diagnostics are
+different outputs and should not share accidental string contracts.
 
 ```bash
-go test ./lessons/13_advanced_errors/...
+go test ./lessons/13_advanced_errors
 ```
 
-## Run tests
+## Tradeoffs and common mistakes
 
-Run the example tests and package compilation check with:
+- Exporting a sentinel or error type commits the package to its meaning.
+- `errors.Join` preserves independent failures but callers still need a partial
+  result policy.
+- Logging at every layer duplicates one failure; enrich while returning and log at
+  the boundary that decides the outcome.
+- Validation fields should be stable identifiers, not presentation text.
 
-```bash
-go test ./lessons/13_advanced_errors/...
-```
+## Interview prompts and practice
+
+1. When would you choose a sentinel over a typed error?
+2. How do you avoid leaking database or payment-provider details to an API client?
+3. Extend `Charge` with a wrapped provider error and prove `errors.Is` still works.

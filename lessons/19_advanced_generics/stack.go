@@ -15,6 +15,7 @@ func (s *Stack[T]) Pop() (T, bool) {
 	}
 	last := len(s.items) - 1
 	value := s.items[last]
+	s.items[last] = zero
 	s.items = s.items[:last]
 	return value, true
 }

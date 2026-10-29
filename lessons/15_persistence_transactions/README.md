@@ -1,41 +1,29 @@
 # Lesson 15: Persistence and Transactions
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Using `database/sql` for connection pooling, queries, and scans.
-- Passing context into database operations.
-- Defining transaction boundaries close to the use case.
-- Rolling back safely and committing only after all required work succeeds.
-- Introducing repository interfaces only when they clarify seams.
-- Choosing test strategies for persistence code.
-
-## Quick reading
-
-The `database/sql` package provides a common abstraction over SQL drivers. A `*sql.DB` is a concurrency-safe pool, not a single connection. Long-running calls should receive a context so request cancellation and deadlines can stop database work.
-
-Transactions should express business boundaries. Begin the transaction near the application operation that requires atomicity, pass the transaction through the functions that need it, roll back on error, and commit at the end. Avoid creating repository interfaces by default; introduce them when they make tests or package boundaries clearer.
-
-This lesson pairs naturally with `lessons/14_http_services`.
-
-## Suggested exercises
-
-1. Write a query function that accepts `context.Context` and scans rows carefully.
-2. Implement a transaction helper that rolls back on error and commits on success.
-3. Compare testing with a fake repository, a test database, and SQL-level integration tests.
-4. Document where transaction boundaries belong in a sample service operation.
-
-## Run the lesson
-
-The `transactions.go` example shows a context-aware transaction boundary around an insert operation. From the repository root:
+`*sql.DB` is a concurrency-safe pool, not one connection. Put transaction boundaries
+around business invariants, begin close to the use case, pass the transaction to the
+operations that participate, roll back on every early return, and commit once at the
+end. Context bounds acquisition and database calls.
 
 ```bash
-go test ./lessons/15_persistence_transactions/...
+go test ./lessons/15_persistence_transactions
 ```
 
-## Run tests
+The example intentionally depends only on `database/sql`; exercising it requires a
+driver and integration database chosen by the application.
 
-Run the example tests and package compilation check with:
+## Tradeoffs and common mistakes
 
-```bash
-go test ./lessons/15_persistence_transactions/...
-```
+- A repository interface should clarify an application seam, not mirror every SQL
+  method.
+- Long transactions increase lock time and reduce concurrency.
+- Driver placeholder syntax and `LastInsertId` support are database-specific.
+- Always decide how commit errors and rollback errors are reported.
+
+## Interview prompts and practice
+
+1. Which layer owns the transaction for a multi-repository use case?
+2. How do you test rollback and commit failure paths?
+3. Implement a transfer operation whose balance invariant is atomic.

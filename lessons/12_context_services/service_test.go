@@ -25,3 +25,13 @@ func TestFetchReturnsResult(t *testing.T) {
 		t.Fatalf("Fetch() = %q, %v; want %q, nil", got, err, "ready")
 	}
 }
+
+func TestFetchReturnsNoWorkForClosedChannel(t *testing.T) {
+	result := make(chan string)
+	close(result)
+
+	_, err := Fetch(context.Background(), result)
+	if !errors.Is(err, ErrNoWork) {
+		t.Fatalf("Fetch() error = %v; want ErrNoWork", err)
+	}
+}

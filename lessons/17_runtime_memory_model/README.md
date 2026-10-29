@@ -1,47 +1,28 @@
-# Lesson 17: Memory Model and Runtime Behavior
+# Lesson 17: Runtime and Memory Model
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Reading escape analysis output and reducing unnecessary allocations.
-- Understanding garbage collector behavior and tuning tradeoffs.
-- Reasoning about data races and happens-before relationships.
-- Knowing how the scheduler affects goroutine execution.
-- Estimating goroutine lifecycle costs and avoiding leaks.
-
-## Quick reading
-
-The Go runtime handles scheduling, stacks, allocation, and garbage collection, but production engineers still need to understand the tradeoffs. Escape analysis explains why some values move from stack to heap. The garbage collector favors low pause times, but allocation-heavy code still creates work. The memory model explains when writes in one goroutine are guaranteed to be visible to another.
-
-Use the race detector to catch unsynchronized access, but do not use it as a substitute for design. Establish clear ownership, synchronization, or channel communication. For performance investigations, measure before and after changes with benchmarks and profiles.
-
-Pair this lesson with `lessons/06_concurrency` and `lessons/09_performance`.
-
-## Suggested exercises
-
-1. Run escape analysis on a small function and explain why a value escapes.
-2. Benchmark two implementations with different allocation behavior.
-3. Write a race, confirm `go test -race` detects it, then fix it.
-4. Demonstrate a goroutine leak and add cancellation to stop it.
-5. Compare mutex synchronization with channel ownership for shared data.
-
-## Run the lesson
-
-The `counter.go` example demonstrates mutex synchronization for concurrent writes. From the repository root:
+A data race is unsynchronized concurrent access where at least one access writes.
+The memory model defines which synchronization events establish a happens-before
+relationship; timing and “it usually runs first” do not. The scheduler, allocator,
+and garbage collector affect cost but do not repair missing synchronization.
 
 ```bash
-go test ./lessons/17_runtime_memory_model/...
+go test ./lessons/17_runtime_memory_model
+go test -race ./lessons/17_runtime_memory_model
 ```
 
-## Run tests
+## Tradeoffs and common mistakes
 
-Run the example tests and package compilation check with:
+- The race detector finds executed races, not every possible race.
+- Mutexes and atomics must not be copied after first use.
+- Escape analysis explains compiler placement decisions; it is not a direct measure
+  of application performance.
+- Reducing allocations can increase retention or complexity; profile first.
+- Goroutine stacks grow, but goroutines still consume memory and scheduler work.
 
-```bash
-go test ./lessons/17_runtime_memory_model/...
-```
+## Interview prompts and practice
 
-For race-focused examples, use:
-
-```bash
-go test -race ./lessons/17_runtime_memory_model/...
-```
+1. Which channel and mutex operations establish happens-before relationships?
+2. How do you distinguish a race, deadlock, and goroutine leak?
+3. Write a failing race-detector example, fix it, and explain the synchronization.

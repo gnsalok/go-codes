@@ -1,40 +1,30 @@
 # Lesson 11: Package Design
 
-## Core Go concepts
+## Learning goals and mental model
 
-- Naming packages after the behavior they provide rather than broad technical layers.
-- Designing small exported APIs and keeping implementation details unexported.
-- Using `internal/` packages to enforce module boundaries.
-- Avoiding circular dependencies by moving shared behavior behind smaller abstractions.
-- Managing module versions and `replace` directives responsibly.
+Design packages around one behavior that can be described without listing files.
+Keep the exported surface small, direct dependencies inward, and let useful zero
+values work when that does not hide invalid state. Package names describe what the
+caller gets—`cache`, `auth`, or `invoice`—rather than vague buckets such as `common`.
 
-## Quick reading
-
-Start by reviewing the public surface of a package: exported names, constructor functions, and the interfaces accepted by callers. Good Go packages are usually small, cohesive, and easy to describe in one sentence. Prefer package names such as `auth`, `cache`, or `invoice` over names such as `helpers` or `common` because behavior-oriented names make dependencies easier to understand.
-
-Use `internal/` when a package is useful inside the repository but should not become part of the public module contract. If two packages import each other, split the shared contract into a smaller package or move behavior toward the caller that owns the dependency.
-
-Pair this lesson with `lessons/03_interfaces_and_decoupling` before designing public APIs.
-
-## Suggested exercises
-
-1. Take a package with too many exported names and make implementation details unexported.
-2. Move repository-only helpers into an `internal/` package and confirm external packages cannot import them.
-3. Refactor a circular dependency sketch into one-directional dependencies.
-4. Write a short package comment that explains the package behavior without describing its files.
-
-## Run the lesson
-
-The `cache.go` example shows a small behavior-focused package with a narrow exported API and hidden storage details:
+The example exposes construction, lookup, and mutation while hiding map storage.
+Both `NewCache` and the zero value are ready to use:
 
 ```bash
-go test ./lessons/11_package_design/...
+go test ./lessons/11_package_design
 ```
 
-## Run tests
+## Tradeoffs and common mistakes
 
-Run the example tests and package compilation check with:
+- Every exported name becomes a compatibility commitment.
+- `internal/` enforces repository boundaries; naming alone does not.
+- A package named after a technical layer often accumulates unrelated behavior.
+- Moving a shared type “down” can create a dependency cycle; move contracts toward
+  the consumer or introduce a smaller neutral package only when it is cohesive.
 
-```bash
-go test ./lessons/11_package_design/...
-```
+## Interview prompts and practice
+
+1. How do you decide whether a constructor is necessary?
+2. Where should an interface live when two packages collaborate?
+3. Refactor an oversized package into cohesive boundaries and draw the dependency
+   direction before moving code.
