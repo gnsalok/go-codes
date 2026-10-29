@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 type Number interface {
-	int | float64
+	~int | ~float64
 }
 
 func Add[T Number](x, y T) T {
@@ -11,12 +11,12 @@ func Add[T Number](x, y T) T {
 }
 
 // Map applies function f to each element of s and returns a new slice.
-func Map[T any, U any](s []T, f func(T) U) []U {
-	out := make([]U, 0, len(s))
-	for _, v := range s {
-		out = append(out, f(v))
+func Map[T, U any](values []T, transform func(T) U) []U {
+	mapped := make([]U, 0, len(values))
+	for _, value := range values {
+		mapped = append(mapped, transform(value))
 	}
-	return out
+	return mapped
 }
 
 func main() {

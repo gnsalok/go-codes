@@ -52,7 +52,7 @@ work, record a benchmark before changing the implementation.
 | [07](lessons/07_generics/README.md) | Generics | Constraints and when concrete code is clearer |
 | [08](lessons/08_time/README.md) | Time | Instants, locations, parsing, and testable clocks |
 | [09](lessons/09_performance/README.md) | Performance | Measurement, allocation analysis, and profiling |
-| [10](lessons/10_go_1_25_features/README.md) | Go version evolution | Reading release notes and adopting new APIs deliberately |
+| [10](lessons/10_go_version_evolution/README.md) | Go version evolution | Reading release notes and adopting new APIs deliberately |
 | [11](lessons/11_package_design/README.md) | Package design | Cohesion, exported surface area, and dependency direction |
 | [12](lessons/12_context_services/README.md) | Context | Cancellation across service boundaries |
 | [13](lessons/13_advanced_errors/README.md) | Error contracts | Stable domain errors and partial failure |
