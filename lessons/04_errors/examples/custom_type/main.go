@@ -1,4 +1,4 @@
-// http://golang.org/src/pkg/encoding/json/decode.go
+// Source: https://go.dev/src/encoding/json/decode.go
 // Sample program to show how to implement a custom error type
 // based on the json package in the standard library.
 package main
@@ -63,7 +63,7 @@ func main() {
 
 // Unmarshal simulates an unmarshal call that always fails.
 // This is coming from builtin error pkg
-func Unmarshal(data []byte, v interface{}) error {
+func Unmarshal(_ []byte, v any) error {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
 		return &InvalidUnmarshalError{reflect.TypeOf(v)}

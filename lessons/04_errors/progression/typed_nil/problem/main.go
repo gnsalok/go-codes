@@ -1,4 +1,4 @@
-// Sample program to show see if the class can find the bug.
+// This program demonstrates a typed-nil interface bug.
 package main
 
 import "log"
@@ -11,7 +11,8 @@ func (c *customError) Error() string {
 	return "Find the bug."
 }
 
-// fail returns nil values for both return types.
+// fail returns a nil *customError. Assigning it to error produces a non-nil
+// interface because the interface still records the dynamic type *customError.
 func fail() ([]byte, *customError) {
 	return nil, nil
 }

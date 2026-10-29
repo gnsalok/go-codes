@@ -1,31 +1,67 @@
-# Lesson 04: Errors
+# Lesson 04: Errors, Panics, and Recovery
 
-## Core Go concepts
+## Learning goals
 
-- Returning and checking explicit `error` values.
-- Creating custom error types and sentinel error variables.
-- Wrapping errors and inspecting chains with `errors.Is` and `errors.As`.
-- Recovering from panics with `defer` and `recover`.
-- Understanding typed-nil error traps.
+- Add operation-specific context while preserving an error chain.
+- Choose `errors.Is`, `errors.As`, or direct comparison intentionally.
+- Explain why an interface containing a typed nil pointer is non-nil.
+- Use panic and recovery only at a boundary that can make a safe decision.
 
-## Quick reading
+## Mental model
 
-The files in `errors/` progress from basic error handling to more advanced error chains and recovery. `error_wrap.go`, `error_is_and_as.go`, and the custom error examples are best read together because they show how callers preserve context while still allowing programmatic checks. The `tricky_problem/` directory demonstrates the typed-nil problem and its fix, which is an important Go interview and production debugging topic.
+An error is a value and often part of an API contract. Wrap with `%w` when a
+caller must retain access to the cause. Use `errors.Is` for identity or semantic
+equivalence and `errors.As` to extract structured error data. Do not branch on
+error strings.
 
-## Run the lesson
+Panic unwinds the current goroutine while running deferred calls. `recover` can
+stop that unwind only when called by a deferred function in the same goroutine.
+Recovery is appropriate at process or request boundaries that can log context,
+restore invariants, and return a controlled failure; it is not ordinary error
+handling.
 
-From the repository root:
-
-```bash
-go run ./lessons/04_errors/errors/error_wrap.go
-```
-
-Many files are independent demonstrations, so run specific files when a directory contains more than one `main` function.
-
-## Run tests
-
-This lesson currently has no `_test.go` files, but package compilation can be checked with:
+## Runnable examples
 
 ```bash
-go test ./lessons/04_errors/...
+go run ./lessons/04_errors/examples/wrapping
+go run ./lessons/04_errors/examples/is_and_as
+go run ./lessons/04_errors/examples/custom_type
+go run ./lessons/04_errors/examples/switch_on_sentinel
+go run ./lessons/04_errors/examples/recover_simple
+go test ./lessons/04_errors/examples/...
 ```
+
+## Typed-nil progression
+
+Both programs compile. The problem exits through `log.Fatal` because assigning a
+nil `*customError` to `error` creates an interface with a dynamic type. The solution
+returns `error` directly and therefore returns a nil interface on success.
+
+```bash
+go run ./lessons/04_errors/progression/typed_nil/problem
+go run ./lessons/04_errors/progression/typed_nil/solution
+```
+
+## Production tradeoffs and common mistakes
+
+- Wrapping every layer with vague text creates noisy chains; add the operation and
+  relevant identifiers instead.
+- Sentinel errors are easy to inspect but form a long-lived public contract.
+- Typed errors carry structured data but expose more API surface.
+- Logging and returning the same error at every layer duplicates incidents. Add
+  context while returning, and log once at the system boundary.
+- Recovering without restoring a valid state can let corrupted work continue.
+
+## Interview prompts
+
+1. When should a caller use `errors.Is` rather than direct equality?
+2. What exactly makes a typed-nil interface non-nil?
+3. Where would you recover from a panic in an HTTP service, and what would you do
+   before returning a response?
+4. How do you expose a stable error contract without coupling callers to strings?
+
+## Practice
+
+Create a batch operation that returns successful results plus `errors.Join` for
+independent failures. Write tests proving callers can still find each sentinel or
+typed error through the joined chain.

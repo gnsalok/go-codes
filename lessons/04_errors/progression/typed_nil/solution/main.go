@@ -1,4 +1,4 @@
-// Sample program to show see if the class can find the bug.
+// This program fixes the typed-nil interface bug in the companion example.
 package main
 
 import "log"
@@ -7,14 +7,12 @@ import "log"
 type customError struct{}
 
 // Error implements the error interface.
-// TIPs : Never use value semantic with Custom Error
 func (c *customError) Error() string {
 	return "Find the bug."
 }
 
-// fail returns nil values for both return types.
-// Solution : Return error type, not *CustomError
-// Bcz it is a concrete type
+// Returning the error interface directly lets the function return a genuinely
+// nil interface when no error occurred.
 func fail() ([]byte, error) {
 	return nil, nil
 }
