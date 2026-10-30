@@ -83,3 +83,12 @@ func slow(ctx context.Context) <-chan string {
 **Hint:** Use a `select` with `ctx.Done()` around the send, or use a buffered channel only when the result count is known and bounded.
 
 **Production skill:** Understanding that cancellation must be observed by the goroutine that can block.
+
+## Exercise 7: Bounded, fail-fast job processor
+
+Combine the worker limit, cancellation, first-error propagation, and channel
+ownership rules in one interview-sized executable. Then explain how the design
+changes when already-started jobs must drain after cancellation.
+
+The runnable solution, focused tests, and whiteboard mental model are in
+[`concurrency/interview/bounded_job_processor`](concurrency/interview/bounded_job_processor/README.md).
